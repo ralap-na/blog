@@ -13,9 +13,12 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <!-- Maven Plugin Versions -->
     <maven.surefire.plugin.version>3.0.0-M9</maven.surefire.plugin.version>
-    <junit.jupiter.engine.version>5.9.1</junit.jupiter.engine.version>
     <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
+
+    <!-- JUnit 5 -->
+    <junit.jupiter.engine.version>5.9.1</junit.jupiter.engine.version>
     <junit.jupiter.api.version>5.9.1</junit.jupiter.api.version>
 
     <!--  sprintboot  -->
@@ -27,10 +30,12 @@
   <build>
     <plugins>
       <plugin>
+        <!-- Surefire Plugin for tests -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven.surefire.plugin.version}</version>
         <configuration>
+          <!-- 如果測試失敗，是否繼續 build。預設是 false -->
           <testFailureIgnore>false</testFailureIgnore>
         </configuration>
         <dependencies>
@@ -45,6 +50,15 @@
   </build>
 
   <dependencies>
+    <!-- Spring Boot Web -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>${springboot.version}</version>
+    </dependency>
+
+
+    <!-- JUnit 5 -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
