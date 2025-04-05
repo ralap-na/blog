@@ -65,5 +65,13 @@
       <version>${junit.jupiter.api.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- JSONObject -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20211205</version>
+    </dependency>
+
   </dependencies>
 </project>
