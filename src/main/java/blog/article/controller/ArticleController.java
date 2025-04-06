@@ -4,12 +4,10 @@ import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/article")
+@RestController
+@RequestMapping("/article")
 public class ArticleController {
 
     @Autowired
@@ -17,6 +15,7 @@ public class ArticleController {
 
     @PutMapping("/{articleId}")
     public ResponseEntity<String> update(@RequestBody String info, @PathVariable String articleId){
+
         JSONObject jsonObject = new JSONObject(info);
 
         String title = jsonObject.getString("title");

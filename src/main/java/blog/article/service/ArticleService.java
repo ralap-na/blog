@@ -14,8 +14,10 @@ public class ArticleService {
     public Boolean update(String articleId, String title, String content, String tag, String category){
         Article article = repository.findArticleById(articleId);
 
+        if (article == null) {
+            return false; // 文章不存在，返回 false
+        }
         article.update(title, content, tag, category);
-
         repository.saveArticle(article);
         return true;
     }
