@@ -29,4 +29,18 @@ public class UserService {
 
         return true;
     }
+
+    public boolean loginUser(String username, String password) {
+        if (repository.findUserByUsername(username).isEmpty()) {
+            return false;
+        }
+
+        User user = repository.findUserByUsername(username).get();
+
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    public String getUserIdByUserName(String username) {
+        return repository.findUserByUsername(username).get().getUserId();
+    }
 }
