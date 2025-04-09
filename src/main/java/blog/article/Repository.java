@@ -29,4 +29,8 @@ public class Repository {
     public void saveUser(User user) {
         userList.put(user.getUserId(), user);
     }
+
+    public User findUserById(String userId) {
+        return userList.get(userId);
+    }
 }
