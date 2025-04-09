@@ -43,4 +43,14 @@ public class UserService {
     public String getUserIdByUserName(String username) {
         return repository.findUserByUsername(username).get().getUserId();
     }
+
+    public boolean updateUser(String userId, String username, String password) {
+        User user = repository.findUserById(userId);
+
+        user.update(username, password);
+
+        repository.saveUser(user);
+
+        return true;
+    }
 }

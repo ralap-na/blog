@@ -47,6 +47,26 @@ public class UserController {
         }
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<String> updateUser(@RequestBody String userInfo, HttpSession session) {
+        String sessionUserId = (String) session.getAttribute("userId");
+
+        if (sessionUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("not login");
+        }
+
+        JSONObject jsonObject = new JSONObject(userInfo);
+        String username = jsonObject.getString("username");
+        String password = jsonObject.getString("password");
+
+        boolean result = userService.updateUser(sessionUserId, username, password);
+        if (result) {
+            return ResponseEntity.ok("User update successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed to update user.");
+        }
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<String> getProfile(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
