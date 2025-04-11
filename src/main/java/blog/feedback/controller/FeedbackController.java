@@ -1,5 +1,7 @@
 package blog.feedback.controller;
 
+import blog.common.OperationOutcome;
+import blog.common.OutcomeState;
 import blog.feedback.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,9 @@ public class FeedbackController {
 
     @PostMapping("/{userId}/{articleId}/comment-edited")
     public ResponseEntity<String> createComment(@PathVariable String userId, @PathVariable String articleId, @RequestBody String content){
-        Boolean message = feedbackService.createComment(articleId, userId, content, Instant.now());
+        OperationOutcome outcome = feedbackService.createComment(articleId, userId, content, Instant.now());
 
-        if(message){
+        if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
         else{
@@ -26,9 +28,9 @@ public class FeedbackController {
 
     @PutMapping("/{userId}/{articleId}/{commentId}/comment-edited")
     public ResponseEntity<String> updateComment(@PathVariable String userId, @PathVariable String articleId, @PathVariable String commentId, @RequestBody String content){
-        Boolean message = feedbackService.updateComment(commentId, userId, content, Instant.now());
+        OperationOutcome outcome = feedbackService.updateComment(commentId, userId, content, Instant.now());
 
-        if(message){
+        if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
         else{
@@ -38,9 +40,9 @@ public class FeedbackController {
 
     @PostMapping("/{userId}/{articleId}/add-reaction")
     public ResponseEntity<String> addReaction(@PathVariable String userId, @PathVariable String articleId, @RequestBody String type){
-        Boolean message = feedbackService.addReaction(articleId, userId, type);
+        OperationOutcome outcome = feedbackService.addReaction(articleId, userId, type);
 
-        if(message){
+        if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
         else{
@@ -50,9 +52,9 @@ public class FeedbackController {
 
     @DeleteMapping("/{userId}/{articleId}/{reactionId}/delete-reaction")
     public ResponseEntity<String> deleteReaction(@PathVariable String userId, @PathVariable String articleId, @PathVariable String reactionId){
-        Boolean message = feedbackService.removeReaction(reactionId, userId);
+        OperationOutcome outcome = feedbackService.removeReaction(reactionId, userId);
 
-        if(message){
+        if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
         else{
