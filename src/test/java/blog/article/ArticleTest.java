@@ -27,6 +27,15 @@ public class ArticleTest {
 
         article.delete();
 
-        Assertions.assertEquals(true, article.getDeleted());
+        assertEquals(true, article.getDeleted());
+    }
+
+    @Test
+    public void recoverArticle(){
+        Article article = new Article("1", "1", "test title", "test content", "test tag", "test category", Instant.now(), true);
+
+        article.recover();
+
+        assertEquals(false, article.getDeleted());
     }
 }

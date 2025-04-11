@@ -84,8 +84,23 @@ public class ArticleServiceTest {
 
     @Test
     public void deleteNotExistArticle(){
-        boolean success = articleService.delete("1", "2");
+        boolean fail = articleService.delete("1", "2");
 
-        assertEquals(false, success);
+        assertEquals(false, fail);
+    }
+
+    @Test
+    public void recoverArticle(){
+        articleService.delete("1", "1");
+        boolean success = articleService.recover("1", "1");
+
+        assertEquals(true, success);
+    }
+
+    @Test
+    public void recoverNotExistArticle(){
+        boolean fail = articleService.recover("1", "1");
+
+        assertEquals(false, fail);
     }
 }

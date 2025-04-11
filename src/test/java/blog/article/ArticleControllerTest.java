@@ -181,4 +181,26 @@ class ArticleControllerTest {
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    public void recoverArticle(){
+        String userId = "1";
+        String articleId = "1";
+
+        repository.delete(articleId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/" + userId + "/" + articleId,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        // 檢查reponse status code 是否是 200 OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

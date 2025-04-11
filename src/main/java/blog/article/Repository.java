@@ -30,4 +30,12 @@ public class Repository {
 
         deletedArticleList.put(articleId, article);
     }
+
+    public void recover(String articleId){
+        Article article = deletedArticleList.get(articleId);
+        article.recover();
+        deletedArticleList.remove(articleId);
+
+        articleList.put(articleId, article);
+    }
 }

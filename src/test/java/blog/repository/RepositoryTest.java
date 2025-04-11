@@ -54,4 +54,29 @@ public class RepositoryTest {
         assertEquals("Deleted Category", deletedArticle.getCategory());
         assertEquals(true, deletedArticle.getDeleted());
     }
+
+    @Test
+    public void recoverArticle(){
+        Article article = new Article();
+        article.setUserId("1");
+        article.setArticleId("1");
+        article.setTitle("Recovered Title");
+        article.setContent("Recovered Content");
+        article.setTag("Recovered Tag");
+        article.setCategory("Recovered Category");
+
+        repository.saveArticle(article);
+
+        repository.delete("1");
+        Article deletedArticle = repository.findDeletedArticleById("1");
+        assertEquals(true, deletedArticle.getDeleted());
+
+        repository.recover("1");
+        Article recoveredArticle = repository.findArticleById("1");
+        assertEquals("Recovered Title", deletedArticle.getTitle());
+        assertEquals("Recovered Content", deletedArticle.getContent());
+        assertEquals("Recovered Tag", deletedArticle.getTag());
+        assertEquals("Recovered Category", deletedArticle.getCategory());
+        assertEquals(false, recoveredArticle.getDeleted());
+    }
 }

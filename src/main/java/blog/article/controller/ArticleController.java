@@ -93,4 +93,16 @@ public class ArticleController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PutMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> recover(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        Boolean message = articleService.recover(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

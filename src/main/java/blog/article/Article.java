@@ -101,4 +101,8 @@ public class Article {
     public void delete(){
         this.setDeleted(true);
     }
+
+    public void recover(){
+        this.setDeleted(false);
+    }
 }
