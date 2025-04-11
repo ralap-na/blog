@@ -97,4 +97,8 @@ public class Article {
 
         return this;
     }
+
+    public void delete(){
+        this.setDeleted(true);
+    }
 }

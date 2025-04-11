@@ -47,4 +47,22 @@ public class ArticleService {
         repository.saveArticle(article);
         return true;
     }
+
+    public boolean delete(String userId, String articleId){
+        Article article = repository.findArticleById(articleId);
+
+        if (article == null) {
+            return false; // 文章不存在，返回 false
+        }
+
+        if(userId.equals(article.getUserId())){
+            repository.delete(articleId);
+        }
+
+        if(repository.findArticleById(articleId) == null && repository.findDeletedArticleById(articleId) != null){
+            return true;
+        }
+
+        return false;
+    }
 }

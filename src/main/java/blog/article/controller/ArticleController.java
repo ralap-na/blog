@@ -1,5 +1,6 @@
 package blog.article.controller;
 
+import blog.article.Article;
 import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,18 @@ public class ArticleController {
         String category = jsonObject.getString("category");
 
         Boolean message = articleService.update(articleId, title, content, tag, category);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> delete(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        Boolean message = articleService.delete(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();

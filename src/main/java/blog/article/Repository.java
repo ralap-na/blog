@@ -9,6 +9,7 @@ import java.util.Map;
 public class Repository {
 
     private Map<String, Article> articleList = new HashMap<>();
+    private Map<String, Article> deletedArticleList = new HashMap<>();
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
@@ -16,5 +17,17 @@ public class Repository {
 
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
+    }
+
+    public Article findDeletedArticleById(String articleId){
+        return deletedArticleList.get(articleId);
+    }
+
+    public void delete(String articleId) {
+        Article article = articleList.get(articleId);
+        article.delete();
+        articleList.remove(articleId);
+
+        deletedArticleList.put(articleId, article);
     }
 }

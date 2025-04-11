@@ -1,6 +1,7 @@
 package blog.article;
 
 import net.minidev.json.JSONObject;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,5 +160,25 @@ class ArticleControllerTest {
 
         // 檢查reponse status code 是否是 500 Internal Server Error
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteArticle(){
+        String userId = "1";
+        String articleId = "1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/" + userId + "/" + articleId,
+                HttpMethod.DELETE,
+                request,
+                String.class
+        );
+
+        // 檢查reponse status code 是否是 200 OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }
