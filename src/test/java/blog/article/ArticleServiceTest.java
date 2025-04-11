@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class ArticleServiceTest {
@@ -53,7 +53,7 @@ public class ArticleServiceTest {
     public void getNotExistArticle(){
         Article article = articleService.getArticle("2");
 
-        assertEquals(null, article);
+        assertNull(article);
     }
 
     @Test
@@ -79,14 +79,14 @@ public class ArticleServiceTest {
     public void deleteArticle(){
         boolean success = articleService.delete("1", "1");
 
-        assertEquals(true, success);
+        assertTrue(success);
     }
 
     @Test
     public void deleteNotExistArticle(){
         boolean fail = articleService.delete("1", "2");
 
-        assertEquals(false, fail);
+        assertFalse(fail);
     }
 
     @Test
@@ -94,13 +94,13 @@ public class ArticleServiceTest {
         articleService.delete("1", "1");
         boolean success = articleService.recover("1", "1");
 
-        assertEquals(true, success);
+        assertTrue(success);
     }
 
     @Test
     public void recoverNotExistArticle(){
         boolean fail = articleService.recover("1", "1");
 
-        assertEquals(false, fail);
+        assertFalse(fail);
     }
 }

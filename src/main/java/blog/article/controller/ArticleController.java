@@ -84,7 +84,7 @@ public class ArticleController {
 
     @DeleteMapping("/{userId}/{articleId}")
     public ResponseEntity<String> delete(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        Boolean message = articleService.delete(userId, articleId);
+        boolean message = articleService.delete(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
@@ -96,7 +96,7 @@ public class ArticleController {
 
     @PutMapping("/{userId}/{articleId}")
     public ResponseEntity<String> recover(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        Boolean message = articleService.recover(userId, articleId);
+        boolean message = articleService.recover(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();

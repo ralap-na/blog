@@ -3,15 +3,13 @@ package blog.repository;
 import blog.article.Article;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class RepositoryTest {
 
-    private Repository repository = new Repository();
+    private final Repository repository = new Repository();
 
     @Test
     public void saveArticle(){

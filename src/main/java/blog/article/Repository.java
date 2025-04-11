@@ -8,8 +8,8 @@ import java.util.Map;
 @Component
 public class Repository {
 
-    private Map<String, Article> articleList = new HashMap<>();
-    private Map<String, Article> deletedArticleList = new HashMap<>();
+    private final Map<String, Article> articleList = new HashMap<>();
+    private final Map<String, Article> deletedArticleList = new HashMap<>();
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
