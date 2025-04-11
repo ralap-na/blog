@@ -22,6 +22,12 @@ public class Repository {
         return articles;
     }
 
+    public Collection<Article> findArticlesByTitle(String keyword){
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getTitle().contains(keyword)).toList();
+        return articles;
+    }
+
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }

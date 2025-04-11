@@ -70,6 +70,13 @@ public class ArticleController {
         return ResponseEntity.ok().body(articles);
     }
 
+    @GetMapping("/title/{keyword}")
+    public ResponseEntity<Collection<Article>> getArticlesByTitle(@PathVariable String keyword){
+        Collection<Article> articles = articleService.getArticlesByTitle(keyword);
+
+        return ResponseEntity.ok().body(articles);
+    }
+
     @PutMapping("/{articleId}")
     public ResponseEntity<String> update(@RequestBody String info, @PathVariable String articleId){
 

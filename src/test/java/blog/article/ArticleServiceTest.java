@@ -52,7 +52,7 @@ public class ArticleServiceTest {
 
     @Test
     public void getNotExistArticle(){
-        Article article = articleService.getArticle("2");
+        Article article = articleService.getArticle("3");
 
         assertNull(article);
     }
@@ -64,6 +64,17 @@ public class ArticleServiceTest {
         Collection<Article> articles = articleService.getArticlesByUserId("1");
         for(Article a : articles){
             assertEquals("1", a.getUserId());
+        }
+    }
+
+    @Test
+    public void getArticlesByTitle(){
+        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
+
+        Collection<Article> articles = articleService.getArticlesByTitle("Expected");
+
+        for(Article a : articles){
+            assertTrue(a.getTitle().contains("Expected"));
         }
     }
 

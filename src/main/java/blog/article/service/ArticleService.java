@@ -43,6 +43,11 @@ public class ArticleService {
         return repository.findArticlesByUserId(userId);
     }
 
+    public Collection<Article> getArticlesByTitle(String keyword){
+
+        return repository.findArticlesByTitle(keyword);
+    }
+
     public Boolean update(String articleId, String title, String content, String tag, String category){
         Article article = repository.findArticleById(articleId);
 

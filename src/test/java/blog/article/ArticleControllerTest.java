@@ -32,7 +32,7 @@ class ArticleControllerTest {
         baseUrl = "/article";
 
         repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
-        repository.saveArticle(new Article("1", "2", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
+        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
     }
 
     @Test
@@ -62,7 +62,7 @@ class ArticleControllerTest {
 
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("2", response.getBody());
+        assertEquals("3", response.getBody());
 
         // 驗證 Repository 中的資料是否更新
         Article updatedArticle = repository.findArticleById("3");
@@ -133,6 +133,39 @@ class ArticleControllerTest {
         // 驗證文章 userId 為 "1"
         for (Article article : articles) {
             assertEquals(userId, article.getUserId(), "Each article should belong to userId = 1");
+        }
+
+    }
+
+    @Test
+    public void getArticlesByTitle(){
+        String keyword = "Expected";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/title/" + keyword,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+        // 驗證文章 keyword 為 "Expected"
+        for (Article article : articles) {
+            assertTrue(article.getTitle().contains("Expected"), "Each article's title should contain \"Expected\"");
         }
 
     }

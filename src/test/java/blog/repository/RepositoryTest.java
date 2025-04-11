@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class RepositoryTest {
@@ -44,12 +45,12 @@ public class RepositoryTest {
         article.setCategory("Saved Category");
 
         Article article2 = new Article();
-        article.setUserId("1");
-        article.setArticleId("2");
-        article.setTitle("Saved Title");
-        article.setContent("Saved Content");
-        article.setTag("Saved Tag");
-        article.setCategory("Saved Category");
+        article2.setUserId("1");
+        article2.setArticleId("2");
+        article2.setTitle("Saved Title");
+        article2.setContent("Saved Content");
+        article2.setTag("Saved Tag");
+        article2.setCategory("Saved Category");
 
         repository.saveArticle(article);
         repository.saveArticle(article2);
@@ -58,6 +59,34 @@ public class RepositoryTest {
 
         for(Article a : articles){
             assertEquals("1", a.getUserId());
+        }
+    }
+
+    @Test
+    public void findArticlesByTitle(){
+        Article article = new Article();
+        article.setUserId("1");
+        article.setArticleId("1");
+        article.setTitle("Expected Title");
+        article.setContent("Expected Content");
+        article.setTag("Expected Tag");
+        article.setCategory("Expected Category");
+
+        Article article2 = new Article();
+        article2.setUserId("1");
+        article2.setArticleId("2");
+        article2.setTitle("Other Title");
+        article2.setContent("Other Content");
+        article2.setTag("Other Tag");
+        article2.setCategory("Other Category");
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+
+        Collection<Article> articles = repository.findArticlesByTitle("Expected");
+
+        for(Article a : articles){
+            assertTrue(a.getTitle().contains("Expected"));
         }
     }
 
