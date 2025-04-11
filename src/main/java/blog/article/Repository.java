@@ -1,18 +1,22 @@
 package blog.article;
 
+
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
+import blog.user.User;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class Repository {
 
-    private Map<String, Article> articleList = new HashMap<>();
-    private Map<String, Comment> CommentList = new HashMap<>();
-    private Map<String, Reaction> ReactionList = new HashMap<>();
+    private final Map<String, Article> articleList = new HashMap<>();
+    private final Map<String, User> userList = new HashMap<>();
+    private final Map<String, Comment> CommentList = new HashMap<>();
+    private final Map<String, Reaction> ReactionList = new HashMap<>();
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
@@ -21,6 +25,7 @@ public class Repository {
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }
+
 
     public Comment findCommentById(String commentId){
         return CommentList.get(commentId);
@@ -40,5 +45,17 @@ public class Repository {
 
     public void deleteReaction(String reactionId) {
         ReactionList.remove(reactionId);
+    }
+      
+    public Optional<User> findUserByUsername(String username) {
+        return userList.values().stream().filter(user -> user.getUserId().equals(username)).findAny();
+    }
+
+    public void saveUser(User user) {
+        userList.put(user.getUserId(), user);
+    }
+
+    public User findUserById(String userId) {
+        return userList.get(userId);
     }
 }
