@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collection;
 
 @Service
 public class ArticleService {
@@ -35,6 +36,11 @@ public class ArticleService {
         }
 
         return article;
+    }
+
+    public Collection<Article> getArticlesByUserId(String userId){
+
+        return repository.findArticlesByUserId(userId);
     }
 
     public Boolean update(String articleId, String title, String content, String tag, String category){

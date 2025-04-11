@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/article")
@@ -60,6 +61,13 @@ public class ArticleController {
         else{
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Collection<Article>> getArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getArticlesByUserId(userId);
+
+        return ResponseEntity.ok().body(articles);
     }
 
     @PutMapping("/{articleId}")

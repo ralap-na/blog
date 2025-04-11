@@ -2,6 +2,7 @@ package blog.article;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,12 @@ public class Repository {
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
+    }
+
+    public Collection<Article> findArticlesByUserId(String userId){
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
+        return articles;
     }
 
     public void saveArticle(Article article) {

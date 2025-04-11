@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +55,16 @@ public class ArticleServiceTest {
         Article article = articleService.getArticle("2");
 
         assertNull(article);
+    }
+
+    @Test
+    public void getArticlesByUserId(){
+        repository.saveArticle(new Article("1", "2", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
+
+        Collection<Article> articles = articleService.getArticlesByUserId("1");
+        for(Article a : articles){
+            assertEquals("1", a.getUserId());
+        }
     }
 
     @Test

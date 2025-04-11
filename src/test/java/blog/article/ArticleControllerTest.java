@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.Instant;
+import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ArticleControllerTest {
@@ -30,6 +32,7 @@ class ArticleControllerTest {
         baseUrl = "/article";
 
         repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
+        repository.saveArticle(new Article("1", "2", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
     }
 
     @Test
@@ -37,7 +40,7 @@ class ArticleControllerTest {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
         requestBody.put("userId", "1");
-        requestBody.put("articleId", "2");
+        requestBody.put("articleId", "3");
         requestBody.put("title", "Created Title");
         requestBody.put("content", "Created Content");
         requestBody.put("tag", "Created tag");
@@ -62,7 +65,7 @@ class ArticleControllerTest {
         assertEquals("2", response.getBody());
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById("2");
+        Article updatedArticle = repository.findArticleById("3");
         assertEquals("1", updatedArticle.getUserId());
         assertEquals("Created Title", updatedArticle.getTitle());
         assertEquals("Created Content", updatedArticle.getContent());
@@ -99,6 +102,39 @@ class ArticleControllerTest {
         assertEquals("Original Content", jsonObject.getString("content"));
         assertEquals("Original Tag", jsonObject.getString("tag"));
         assertEquals("Original Category", jsonObject.getString("category"));
+    }
+
+    @Test
+    public void getArticlesByUserId(){
+        String userId = "1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/user/" + userId,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+        // 驗證文章 userId 為 "1"
+        for (Article article : articles) {
+            assertEquals(userId, article.getUserId(), "Each article should belong to userId = 1");
+        }
+
     }
 
     @Test

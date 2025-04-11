@@ -4,6 +4,8 @@ import blog.article.Article;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -29,6 +31,34 @@ public class RepositoryTest {
         assertEquals("Saved Content", saveedArticle.getContent());
         assertEquals("Saved Tag", saveedArticle.getTag());
         assertEquals("Saved Category", saveedArticle.getCategory());
+    }
+
+    @Test
+    public void findArticlesByUserIds(){
+        Article article = new Article();
+        article.setUserId("1");
+        article.setArticleId("1");
+        article.setTitle("Saved Title");
+        article.setContent("Saved Content");
+        article.setTag("Saved Tag");
+        article.setCategory("Saved Category");
+
+        Article article2 = new Article();
+        article.setUserId("1");
+        article.setArticleId("2");
+        article.setTitle("Saved Title");
+        article.setContent("Saved Content");
+        article.setTag("Saved Tag");
+        article.setCategory("Saved Category");
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+
+        Collection<Article> articles = repository.findArticlesByUserId("1");
+
+        for(Article a : articles){
+            assertEquals("1", a.getUserId());
+        }
     }
 
     @Test
