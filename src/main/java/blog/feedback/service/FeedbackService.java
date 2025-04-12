@@ -5,7 +5,6 @@ import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,8 +12,11 @@ import java.util.UUID;
 
 @Service
 public class FeedbackService {
-    @Autowired
-    private Repository repository;
+    private final Repository repository;
+
+    public FeedbackService(Repository repository) {
+        this.repository = repository;
+    }
 
     public OperationOutcome createComment(String articleId, String userId, String content, Instant date) {
         if (content.isEmpty()) {
