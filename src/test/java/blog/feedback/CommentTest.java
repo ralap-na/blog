@@ -7,10 +7,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class CommentTest {
-    private String articleId = UUID.randomUUID().toString();
-    private String userId = "tester";
-    private String content = "This is the original content of this comment.";
-    private Instant date = Instant.now();
+    private final String articleId = UUID.randomUUID().toString();
+    private final String userId = "tester";
+    private final String content = "This is the original content of this comment.";
+    private final Instant date = Instant.now();
 
 
     @Test
@@ -33,6 +33,6 @@ public class CommentTest {
         comment.update(newContent, newDate);
 
         Assertions.assertEquals(newContent, comment.getContent());
-        Assertions.assertEquals(date, comment.getDate());
+        Assertions.assertEquals(newDate, comment.getDate());
     }
 }
