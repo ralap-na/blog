@@ -12,14 +12,6 @@ public class OperationOutcome {
     }
 
     public static OperationOutcome create() {
-        if (id == null) {
-            throw new RuntimeException("Id should not be null");
-        }
-
-        if (state == null) {
-            throw new RuntimeException("State should not be null");
-        }
-
         return new OperationOutcome(id, message, state);
     }
 
