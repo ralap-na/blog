@@ -76,5 +76,9 @@ public class UserController {
         return ResponseEntity.ok("Logged in as user: " + userId);
     }
 
-
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok("Logout successful");
+    }
 }

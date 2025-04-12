@@ -82,7 +82,7 @@ public class Repository {
     }
       
     public Optional<User> findUserByUsername(String username) {
-        return userList.values().stream().filter(user -> user.getUserId().equals(username)).findAny();
+        return userList.values().stream().filter(user -> user.getUsername().equals(username)).findAny();
     }
 
     public void saveUser(User user) {
