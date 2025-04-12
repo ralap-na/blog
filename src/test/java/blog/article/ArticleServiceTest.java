@@ -24,6 +24,7 @@ public class ArticleServiceTest {
 
     @BeforeEach
     void setUp() {
+//        repository.clear();
         Article article = new Article();
         article.setUserId("1");
         article.setArticleId("1");

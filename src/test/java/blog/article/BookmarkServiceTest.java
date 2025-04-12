@@ -1,6 +1,7 @@
 package blog.article;
 
 import blog.article.service.BookmarkService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,12 @@ public class BookmarkServiceTest {
 
     @Autowired
     private Repository repository;
+
+    @AfterEach
+    public void tearDown() {
+        // 清空 Repository 裡的資料
+        repository.clear();
+    }
 
     @Test
     public void addArticle(){

@@ -31,6 +31,7 @@ class ArticleControllerTest {
         // 設定基礎 URL，RANDOM_PORT 會自動分配測試端口
         baseUrl = "/article";
 
+        repository.clear();
         repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
         repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
     }

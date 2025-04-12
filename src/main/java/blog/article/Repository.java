@@ -24,6 +24,10 @@ public class Repository {
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
 
 
+    public void clear(){
+        articleList.clear();
+    }
+
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
     }
