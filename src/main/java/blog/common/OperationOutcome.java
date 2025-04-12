@@ -1,9 +1,9 @@
 package blog.common;
 
 public class OperationOutcome {
-    private String id;
-    private String message;
-    private OutcomeState state;
+    private static String id;
+    private static String message;
+    private static OutcomeState state;
 
     public OperationOutcome(String id, String message, OutcomeState state) {
         this.id = id;
@@ -11,7 +11,7 @@ public class OperationOutcome {
         this.state = state;
     }
 
-    public OperationOutcome create() {
+    public static OperationOutcome create() {
         if (id == null) {
             throw new RuntimeException("Id should not be null");
         }
