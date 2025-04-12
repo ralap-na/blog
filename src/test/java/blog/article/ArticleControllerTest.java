@@ -272,4 +272,49 @@ class ArticleControllerTest {
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    public void addToBookmark() {
+        String userId = "u1";
+        String articleId = "a1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteFromBookmark() {
+        String userId = "u1";
+        String articleId = "a1";
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article.setUserId(userId);
+        repository.saveArticle(article);
+
+        Bookmark bookmark = new Bookmark("u1");
+        repository.saveBookmark(bookmark);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                HttpMethod.DELETE,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

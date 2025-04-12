@@ -1,6 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ public class ArticleController {
 
     @Autowired
     ArticleService articleService;
-
+    @Autowired
+    BookmarkService bookmarkService;
     private Instant converStringToInstant(String date){
         String pattern = "yyyy-MM-dd HH:mm";
 
@@ -112,6 +114,30 @@ public class ArticleController {
     @PutMapping("/{userId}/{articleId}")
     public ResponseEntity<String> recover(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
         boolean message = articleService.recover(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> addToBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.addArticle(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> deleteFromBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.deleteArticle(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();

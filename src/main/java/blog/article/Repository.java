@@ -22,6 +22,8 @@ public class Repository {
     private final Map<String, Comment> CommentList = new HashMap<>();
     private final Map<String, Reaction> ReactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
+    private final Map<String, Bookmark> bookmarkList = new HashMap<>();
+
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
@@ -111,5 +113,13 @@ public class Repository {
 
     public void deleteNotificationById(String notificationId) {
         notificationList.remove(notificationId);
+    }
+  
+    public void saveBookmark(Bookmark bookmark) {
+        bookmarkList.put(bookmark.getUserId(), bookmark);
+    }
+
+    public Bookmark findBookmarkByUserId(String userId){
+        return bookmarkList.get(userId);
     }
 }
