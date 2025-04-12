@@ -15,7 +15,6 @@ import java.util.Optional;
 @Component
 public class Repository {
 
-    private Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
