@@ -28,6 +28,10 @@ public class Repository {
         articleList.clear();
     }
 
+    public Collection<Article> findAllArticles(){
+        return articleList.values();
+    }
+
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
     }
@@ -41,6 +45,18 @@ public class Repository {
     public Collection<Article> findArticlesByTitle(String keyword){
         Collection<Article> articles = articleList.values();
         articles = articles.stream().filter(article -> article.getTitle().contains(keyword)).toList();
+        return articles;
+    }
+
+    public Collection<Article> findArticlesByTag(String tag){
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
+        return articles;
+    }
+
+    public Collection<Article> findArticlesByCategory(String category){
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getCategory().equals(category)).toList();
         return articles;
     }
 

@@ -30,6 +30,49 @@ public class RepositoryTest {
     }
 
     @Test
+    public void findAllArticle(){
+        Article article = buildTestArticle("1", "A", false);
+        Article article2 = buildTestArticle("2", "B", false);
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+
+        Collection<Article> articles = repository.findAllArticles();
+
+        assertEquals(2, articles.size());
+    }
+
+    @Test
+    public void findArticlesByTag(){
+        Article article = buildTestArticle("1", "A", false);
+        Article article2 = buildTestArticle("2", "B", false);
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+
+        Collection<Article> articles = repository.findArticlesByTag("B");
+
+        for(Article a : articles){
+            assertEquals("B Tag", a.getTag());
+        }
+    }
+
+    @Test
+    public void findArticlesByCategory(){
+        Article article = buildTestArticle("1", "A", false);
+        Article article2 = buildTestArticle("2", "B", false);
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+
+        Collection<Article> articles = repository.findArticlesByCategory("B Category");
+
+        for(Article a : articles){
+            assertEquals("B Category", a.getCategory());
+        }
+    }
+
+    @Test
     public void findArticlesByUserIds(){
         Article article = buildTestArticle("1", "Saved", false);
 
