@@ -10,8 +10,17 @@
   <name>blog</name>
   <url>http://maven.apache.org</url>
 
+  <!-- Parent POM configuration to inherit Spring Boot default settings -->
+  <parent>
+    <groupId>org.springframework.boot</groupId> <!-- The groupId of the parent POM -->
+    <artifactId>spring-boot-starter-parent</artifactId> <!-- The artifactId of the parent POM, representing the Spring Boot starter -->
+    <version>3.4.4</version> <!-- The version of the parent POM -->
+    <relativePath/> <!-- Path to the parent POM; empty（<relativePath/>）here means Maven will look for it in the remote repository -->
+  </parent>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>21</java.version>
 
     <!-- Maven Plugin Versions -->
     <maven.surefire.plugin.version>3.0.0-M9</maven.surefire.plugin.version>
@@ -21,14 +30,21 @@
     <junit.jupiter.engine.version>5.9.1</junit.jupiter.engine.version>
     <junit.jupiter.api.version>5.9.1</junit.jupiter.api.version>
 
-    <!--  sprintboot  -->
-    <springboot.version>3.4.4</springboot.version>
-    <springboot.maven.plugin.version>3.4.4</springboot.maven.plugin.version>
   </properties>
 
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId> <!-- The groupId of the maven-compiler-plugin -->
+        <artifactId>maven-compiler-plugin</artifactId> <!-- The artifactId of the maven-compiler-plugin -->
+        <version>${maven.compiler.plugin.version}</version> <!-- Version of the compiler plugin, using a property for flexibility -->
+        <configuration>
+          <!-- Java version settings for compilation -->
+          <source>${java.version}</source> <!-- The source code version (Java version used to compile) -->
+          <target>${java.version}</target> <!-- The target version (Java version the bytecode will be compatible with) -->
+        </configuration>
+      </plugin>
       <plugin>
         <!-- Surefire Plugin for tests -->
         <groupId>org.apache.maven.plugins</groupId>
@@ -46,6 +62,11 @@
           </dependency>
         </dependencies>
       </plugin>
+      <!-- Spring Boot Maven plugin used to package the application as an executable JAR -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId> <!-- Group ID for Spring Boot plugins -->
+        <artifactId>spring-boot-maven-plugin</artifactId> <!-- Plugin to enable Spring Boot features like running and packaging -->
+      </plugin>
     </plugins>
   </build>
 
@@ -54,9 +75,20 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <version>${springboot.version}</version>
     </dependency>
 
+    <!-- Spring Boot starter dependency for unit and integration testing -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId> <!-- Spring Boot's group ID -->
+      <artifactId>spring-boot-starter-test</artifactId> <!-- Includes libraries like JUnit, Mockito, AssertJ, Hamcrest, etc. -->
+      <scope>test</scope> <!-- Only used during testing phase -->
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <version>${springboot.version}</version>
+    </dependency>
 
     <!-- JUnit 5 -->
     <dependency>

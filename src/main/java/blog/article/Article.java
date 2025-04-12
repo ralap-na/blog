@@ -12,6 +12,8 @@ public class Article {
     private Instant date;
     private Boolean isDeleted;
 
+    public Article(){}
+
     public Article(String userId, String articleId, String title, String content, String tag, String category, Instant date, Boolean isDeleted) {
         this.userId = userId;
         this.articleId = articleId;
@@ -94,5 +96,13 @@ public class Article {
         this.category = category;
 
         return this;
+    }
+
+    public void delete(){
+        this.setDeleted(true);
+    }
+
+    public void recover(){
+        this.setDeleted(false);
     }
 }
