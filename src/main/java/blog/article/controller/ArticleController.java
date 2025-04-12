@@ -9,11 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/article")
@@ -23,26 +21,17 @@ public class ArticleController {
     ArticleService articleService;
     @Autowired
     BookmarkService bookmarkService;
-    private Instant converStringToInstant(String date){
-        String pattern = "yyyy-MM-dd HH:mm";
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-
-        return LocalDateTime.parse(date, formatter)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
-    }
 
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody String info){
         JSONObject jsonObject = new JSONObject(info);
-        String articleId = jsonObject.getString("articleId");
+        String articleId = UUID.randomUUID().toString();
         String userId = jsonObject.getString("userId");
         String title = jsonObject.getString("title");
         String content = jsonObject.getString("content");
         String tag = jsonObject.getString("tag");
         String category = jsonObject.getString("category");
-        Instant date = converStringToInstant(jsonObject.getString("date"));
+        Instant date = Instant.parse(jsonObject.getString("date"));
 
         articleId = articleService.create(userId, articleId, title, content, tag, category, date);
 
