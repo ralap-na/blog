@@ -14,7 +14,15 @@ public class ArticleTest {
     @BeforeEach
     public void setUp() {
         Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
-        article = new Article("1", "1", "test title", "test content", "test tag", "test category", fixedTime, false);
+        article = new Article();
+        article.setUserId("1");
+        article.setArticleId("1");
+        article.setTitle("Test  Title");
+        article.setContent("Test  Content");
+        article.setTag("Test  Tag");
+        article.setCategory("Test  Category");
+        article.setDate(fixedTime);
+        article.setDeleted(false);
     }
 
     @Test

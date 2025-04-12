@@ -4,6 +4,7 @@ import blog.article.Article;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -95,6 +96,7 @@ public class RepositoryTest {
     }
 
     private Article buildTestArticle(String id, String action, boolean deleted) {
+        Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
         Article article = new Article();
         article.setUserId(id);
         article.setArticleId(id);
@@ -102,6 +104,7 @@ public class RepositoryTest {
         article.setContent(action + " Content");
         article.setTag(action + " Tag");
         article.setCategory(action + " Category");
+        article.setDate(fixedTime);
         article.setDeleted(deleted);
         return article;
     }

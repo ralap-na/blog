@@ -27,7 +27,7 @@ class ArticleControllerTest {
     private String baseUrl;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         // 設定基礎 URL，RANDOM_PORT 會自動分配測試端口
         baseUrl = "/article";
 
@@ -36,7 +36,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    void createArticleSuccess() {
+    public void createArticleSuccess() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
         requestBody.put("userId", "1");
