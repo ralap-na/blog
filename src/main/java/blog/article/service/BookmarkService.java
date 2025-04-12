@@ -5,6 +5,8 @@ import blog.article.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookmarkService {
     @Autowired
@@ -31,5 +33,15 @@ public class BookmarkService {
 
         bookmark.deleteArticle(articleId);
         return true;
+    }
+
+    public List<String> getArticleIds(String userId) {
+        Bookmark bookmark = repository.findBookmarkByUserId(userId);
+
+        if (bookmark == null) {
+            return null;
+        }
+
+        return bookmark.getArticleIds();
     }
 }

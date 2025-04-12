@@ -317,4 +317,37 @@ class ArticleControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    public void getArticleIdsFromBookmarkByUserId() {
+        Article article1 = new Article();
+        article1.setArticleId("a1");
+        article1.setUserId("u1");
+        repository.saveArticle(article1);
+
+        Article article2 = new Article();
+        article2.setArticleId("a2");
+        article2.setUserId("u1");
+        repository.saveArticle(article2);
+
+        String userId = "u1";
+        Bookmark bookmark = new Bookmark(userId);
+        repository.saveBookmark(bookmark);
+
+        bookmark.addArticle(article1.getArticleId());
+        bookmark.addArticle(article2.getArticleId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }
