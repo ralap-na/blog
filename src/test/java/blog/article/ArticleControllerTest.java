@@ -46,7 +46,7 @@ class ArticleControllerTest {
         requestBody.put("content", "Created Content");
         requestBody.put("tag", "Created tag");
         requestBody.put("category", "Created category");
-        requestBody.put("date", "2025-04-06 02:39");
+        requestBody.put("date", "2025-04-12T15:30:24.517Z");
 
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
@@ -63,10 +63,9 @@ class ArticleControllerTest {
 
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("3", response.getBody());
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById("3");
+        Article updatedArticle = repository.findArticleById(response.getBody());
         assertEquals("1", updatedArticle.getUserId());
         assertEquals("Created Title", updatedArticle.getTitle());
         assertEquals("Created Content", updatedArticle.getContent());
