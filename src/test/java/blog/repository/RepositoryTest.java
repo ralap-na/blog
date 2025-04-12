@@ -1,7 +1,7 @@
 package blog.repository;
 
 import blog.article.Article;
-import blog.article.ArticleCollection;
+import blog.article.Bookmark;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
@@ -111,15 +111,14 @@ public class RepositoryTest {
     }
 
     @Test
-    public void saveCollection() {
-        String collectionId = "c1";
+    public void saveBookmark() {
         String userId = "u1";
-        ArticleCollection articleCollection = new ArticleCollection(collectionId, userId);
+        Bookmark bookmark = new Bookmark(userId);
 
-        repository.saveCollection(articleCollection);
+        repository.saveBookmark(bookmark);
 
-        ArticleCollection articleCollection1 = repository.findCollectionByUserId(userId);
+        Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
 
-        assertEquals(collectionId, articleCollection1.getCollectionId());
+        assertEquals(userId, bookmark1.getUserId());
     }
 }

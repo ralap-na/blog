@@ -1,7 +1,5 @@
-package blog.article.collection;
+package blog.article;
 
-import blog.article.Article;
-import blog.article.ArticleCollection;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,7 +7,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ArticleCollectionTest {
+public class BookmarkTest {
 
     @Test
     public void addArticle() {
@@ -21,11 +19,11 @@ public class ArticleCollectionTest {
         article2.setUserId("u2");
         article2.setArticleId("a2");
 
-        ArticleCollection articleCollection = new ArticleCollection("c1", "u3");
-        articleCollection.addArticle(article1.getArticleId());
-        articleCollection.addArticle(article2.getArticleId());
+        Bookmark bookmark = new Bookmark("u3");
+        bookmark.addArticle(article1.getArticleId());
+        bookmark.addArticle(article2.getArticleId());
 
-        List<String> articleIds = articleCollection.getArticleIds();
+        List<String> articleIds = bookmark.getArticleIds();
         assertTrue(articleIds.contains("a1"));
         assertTrue(articleIds.contains("a2"));
     }
@@ -40,13 +38,13 @@ public class ArticleCollectionTest {
         article2.setUserId("u2");
         article2.setArticleId("a2");
 
-        ArticleCollection articleCollection = new ArticleCollection("c1", "u3");
-        articleCollection.addArticle(article1.getArticleId());
-        articleCollection.addArticle(article2.getArticleId());
+        Bookmark bookmark = new Bookmark("u3");
+        bookmark.addArticle(article1.getArticleId());
+        bookmark.addArticle(article2.getArticleId());
 
-        articleCollection.deleteArticle(article1.getArticleId());
+        bookmark.deleteArticle(article1.getArticleId());
 
-        List<String> articleIds = articleCollection.getArticleIds();
+        List<String> articleIds = bookmark.getArticleIds();
         assertFalse(articleIds.contains("a1"));
         assertTrue(articleIds.contains("a2"));
     }

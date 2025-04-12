@@ -274,7 +274,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void addToCollection() {
+    public void addToBookmark() {
         String userId = "u1";
         String articleId = "a1";
 
@@ -283,7 +283,7 @@ class ArticleControllerTest {
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/collection/" + userId + "/" + articleId,
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
                 HttpMethod.PUT,
                 request,
                 String.class
@@ -293,7 +293,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void deleteFromCollection() {
+    public void deleteFromBookmark() {
         String userId = "u1";
         String articleId = "a1";
         Article article = new Article();
@@ -301,15 +301,15 @@ class ArticleControllerTest {
         article.setUserId(userId);
         repository.saveArticle(article);
 
-        ArticleCollection articleCollection = new ArticleCollection("c1", "u1");
-        repository.saveCollection(articleCollection);
+        Bookmark bookmark = new Bookmark("u1");
+        repository.saveBookmark(bookmark);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/collection/" + userId + "/" + articleId,
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
                 HttpMethod.DELETE,
                 request,
                 String.class

@@ -3,25 +3,23 @@ package blog.article;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticleCollection {
-    private String collectionId;
+public class Bookmark {
     private String userId;
     private List<String> articleIds;
 
-    public ArticleCollection(){}
+    public Bookmark(){}
 
-    public ArticleCollection(String collectionId, String userId) {
-        this.collectionId = collectionId;
+    public Bookmark(String userId) {
         this.userId = userId;
         this.articleIds = new ArrayList<>();
     }
 
-    public void setCollectionId(String collectionId) {
-        this.collectionId = collectionId;
-    }
-
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public void setArticleIds(List<String> articleIds) {
+        this.articleIds = articleIds;
     }
 
     public void addArticle(String articleId) {
@@ -30,10 +28,6 @@ public class ArticleCollection {
 
     public void deleteArticle(String articleId) {
         articleIds.remove(articleId);
-    }
-
-    public String getCollectionId() {
-        return collectionId;
     }
 
     public String getUserId() {

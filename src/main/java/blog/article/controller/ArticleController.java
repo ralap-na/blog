@@ -1,7 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
-import blog.article.service.ArticleCollectionService;
+import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class ArticleController {
     @Autowired
     ArticleService articleService;
     @Autowired
-    ArticleCollectionService articleCollectionService;
+    BookmarkService bookmarkService;
     private Instant converStringToInstant(String date){
         String pattern = "yyyy-MM-dd HH:mm";
 
@@ -123,9 +123,9 @@ public class ArticleController {
         }
     }
 
-    @PutMapping("/collection/{userId}/{articleId}")
-    public ResponseEntity<String> addToCollection(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = articleCollectionService.addArticle(userId, articleId);
+    @PutMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> addToBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.addArticle(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
@@ -135,9 +135,9 @@ public class ArticleController {
         }
     }
 
-    @DeleteMapping("/collection/{userId}/{articleId}")
-    public ResponseEntity<String> deleteFromCollection(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = articleCollectionService.deleteArticle(userId, articleId);
+    @DeleteMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> deleteFromBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.deleteArticle(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
