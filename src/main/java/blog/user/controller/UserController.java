@@ -1,5 +1,6 @@
 package blog.user.controller;
 
+import blog.user.User;
 import blog.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
@@ -68,12 +69,19 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<String> getProfile(HttpSession session) {
+    public ResponseEntity<?> getProfile(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
+
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
         }
-        return ResponseEntity.ok("Logged in as user: " + userId);
+
+        User user = userService.getUser(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/logout")
