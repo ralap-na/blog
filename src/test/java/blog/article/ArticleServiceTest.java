@@ -20,22 +20,26 @@ public class ArticleServiceTest {
     @Autowired
     private Repository repository;
 
+    Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+
     @BeforeEach
     void setUp() {
-        repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
+        Article article = new Article();
+        article.setUserId("1");
+        article.setArticleId("1");
+        article.setTitle("Original Title");
+        article.setContent("Original Content");
+        article.setTag("Original Tag");
+        article.setCategory("Original Category");
+        article.setDate(fixedTime);
+        article.setDeleted(false);
+        repository.saveArticle(article);
     }
 
     @Test
     public void saveArticle(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("2");
-        article.setTitle("save title");
-        article.setContent("save content");
-        article.setTag("save tag");
-        article.setCategory("save category");
 
-        String articleId = articleService.create("1", "2", "save Title", "save Content", "save Tag", "save Category", Instant.now());
+        String articleId = articleService.create("1", "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
     }
@@ -59,7 +63,7 @@ public class ArticleServiceTest {
 
     @Test
     public void getArticlesByUserId(){
-        repository.saveArticle(new Article("1", "2", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
+        repository.saveArticle(new Article("2", "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
 
         Collection<Article> articles = articleService.getArticlesByUserId("1");
         for(Article a : articles){
@@ -69,7 +73,7 @@ public class ArticleServiceTest {
 
     @Test
     public void getArticlesByTitle(){
-        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
+        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", fixedTime, false));
 
         Collection<Article> articles = articleService.getArticlesByTitle("Expected");
 

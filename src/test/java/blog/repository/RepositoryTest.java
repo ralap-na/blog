@@ -5,10 +5,10 @@ import blog.article.ArticleCollection;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RepositoryTest {
@@ -17,41 +17,23 @@ public class RepositoryTest {
 
     @Test
     public void saveArticle(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("1");
-        article.setTitle("Saved Title");
-        article.setContent("Saved Content");
-        article.setTag("Saved Tag");
-        article.setCategory("Saved Category");
+        Article article = buildTestArticle("1", "Saved", false);
 
         repository.saveArticle(article);
 
-        Article saveedArticle = repository.findArticleById("1");
+        Article savedArticle = repository.findArticleById("1");
 
-        assertEquals("Saved Title", saveedArticle.getTitle());
-        assertEquals("Saved Content", saveedArticle.getContent());
-        assertEquals("Saved Tag", saveedArticle.getTag());
-        assertEquals("Saved Category", saveedArticle.getCategory());
+        assertEquals("Saved Title", savedArticle.getTitle());
+        assertEquals("Saved Content", savedArticle.getContent());
+        assertEquals("Saved Tag", savedArticle.getTag());
+        assertEquals("Saved Category", savedArticle.getCategory());
     }
 
     @Test
     public void findArticlesByUserIds(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("1");
-        article.setTitle("Saved Title");
-        article.setContent("Saved Content");
-        article.setTag("Saved Tag");
-        article.setCategory("Saved Category");
+        Article article = buildTestArticle("1", "Saved", false);
 
-        Article article2 = new Article();
-        article2.setUserId("1");
-        article2.setArticleId("2");
-        article2.setTitle("Saved Title");
-        article2.setContent("Saved Content");
-        article2.setTag("Saved Tag");
-        article2.setCategory("Saved Category");
+        Article article2 = buildTestArticle("2", "Saved", false);
 
         repository.saveArticle(article);
         repository.saveArticle(article2);
@@ -65,21 +47,9 @@ public class RepositoryTest {
 
     @Test
     public void findArticlesByTitle(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("1");
-        article.setTitle("Expected Title");
-        article.setContent("Expected Content");
-        article.setTag("Expected Tag");
-        article.setCategory("Expected Category");
+        Article article = buildTestArticle("1", "Expected", false);
 
-        Article article2 = new Article();
-        article2.setUserId("1");
-        article2.setArticleId("2");
-        article2.setTitle("Other Title");
-        article2.setContent("Other Content");
-        article2.setTag("Other Tag");
-        article2.setCategory("Other Category");
+        Article article2 = buildTestArticle("2", "Other", false);
 
         repository.saveArticle(article);
         repository.saveArticle(article2);
@@ -93,13 +63,7 @@ public class RepositoryTest {
 
     @Test
     public void deleteArticle(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("1");
-        article.setTitle("Deleted Title");
-        article.setContent("Deleted Content");
-        article.setTag("Deleted Tag");
-        article.setCategory("Deleted Category");
+        Article article = buildTestArticle("1", "Deleted", false);
 
         repository.saveArticle(article);
 
@@ -110,18 +74,12 @@ public class RepositoryTest {
         assertEquals("Deleted Content", deletedArticle.getContent());
         assertEquals("Deleted Tag", deletedArticle.getTag());
         assertEquals("Deleted Category", deletedArticle.getCategory());
-        assertEquals(true, deletedArticle.getDeleted());
+        assertTrue(deletedArticle.getDeleted());
     }
 
     @Test
     public void recoverArticle(){
-        Article article = new Article();
-        article.setUserId("1");
-        article.setArticleId("1");
-        article.setTitle("Recovered Title");
-        article.setContent("Recovered Content");
-        article.setTag("Recovered Tag");
-        article.setCategory("Recovered Category");
+        Article article = buildTestArticle("1", "Recovered", false);
 
         repository.saveArticle(article);
 
@@ -135,7 +93,21 @@ public class RepositoryTest {
         assertEquals("Recovered Content", deletedArticle.getContent());
         assertEquals("Recovered Tag", deletedArticle.getTag());
         assertEquals("Recovered Category", deletedArticle.getCategory());
-        assertEquals(false, recoveredArticle.getDeleted());
+        assertFalse(recoveredArticle.getDeleted());
+    }
+
+    private Article buildTestArticle(String id, String action, boolean deleted) {
+        Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+        Article article = new Article();
+        article.setUserId(id);
+        article.setArticleId(id);
+        article.setTitle(action + " Title");
+        article.setContent(action + " Content");
+        article.setTag(action + " Tag");
+        article.setCategory(action + " Category");
+        article.setDate(fixedTime);
+        article.setDeleted(deleted);
+        return article;
     }
 
     @Test
