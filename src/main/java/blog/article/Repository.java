@@ -1,6 +1,6 @@
 package blog.article;
 
-
+import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
 import blog.user.User;
@@ -8,18 +8,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
 public class Repository {
 
+    private Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
     private final Map<String, Comment> CommentList = new HashMap<>();
     private final Map<String, Reaction> ReactionList = new HashMap<>();
-
+    private final Map<String, Notification> notificationList = new HashMap<>();
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
@@ -40,7 +42,7 @@ public class Repository {
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }
-
+  
     public Article findDeletedArticleById(String articleId){
         return deletedArticleList.get(articleId);
     }
@@ -91,5 +93,23 @@ public class Repository {
 
     public User findUserById(String userId) {
         return userList.get(userId);
+    }
+     
+    public Notification findNotificationById(String id) {
+        return notificationList.get(id);
+    }
+
+    public List<Notification> findNotificationsByUserId(String userId) {
+        return notificationList.values().stream()
+                .filter(notification -> notification.getUserId().equals(userId))
+                .toList();
+    }
+
+    public void saveNotification(Notification notification) {
+        notificationList.put(notification.getNotificationId(), notification);
+    }
+
+    public void deleteNotificationById(String notificationId) {
+        notificationList.remove(notificationId);
     }
 }
