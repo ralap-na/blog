@@ -272,4 +272,49 @@ class ArticleControllerTest {
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    public void addToCollection() {
+        String userId = "u1";
+        String articleId = "a1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/collection/" + userId + "/" + articleId,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteFromCollection() {
+        String userId = "u1";
+        String articleId = "a1";
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article.setUserId(userId);
+        repository.saveArticle(article);
+
+        ArticleCollection articleCollection = new ArticleCollection("c1", "u1");
+        repository.saveCollection(articleCollection);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/collection/" + userId + "/" + articleId,
+                HttpMethod.DELETE,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

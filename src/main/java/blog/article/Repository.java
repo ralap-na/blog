@@ -11,6 +11,7 @@ public class Repository {
 
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
+    private final Map<String, ArticleCollection> collectionList = new HashMap<>();
 
     public Article findArticleById(String articleId){
         return articleList.get(articleId);
@@ -50,5 +51,13 @@ public class Repository {
         deletedArticleList.remove(articleId);
 
         articleList.put(articleId, article);
+    }
+
+    public void saveCollection(ArticleCollection articleCollection) {
+        collectionList.put(articleCollection.getUserId(), articleCollection);
+    }
+
+    public ArticleCollection findCollectionByUserId(String userId){
+        return collectionList.get(userId);
     }
 }

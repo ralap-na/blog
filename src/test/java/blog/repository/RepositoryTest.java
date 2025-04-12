@@ -1,6 +1,7 @@
 package blog.repository;
 
 import blog.article.Article;
+import blog.article.ArticleCollection;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
@@ -135,5 +136,18 @@ public class RepositoryTest {
         assertEquals("Recovered Tag", deletedArticle.getTag());
         assertEquals("Recovered Category", deletedArticle.getCategory());
         assertEquals(false, recoveredArticle.getDeleted());
+    }
+
+    @Test
+    public void saveCollection() {
+        String collectionId = "c1";
+        String userId = "u1";
+        ArticleCollection articleCollection = new ArticleCollection(collectionId, userId);
+
+        repository.saveCollection(articleCollection);
+
+        ArticleCollection articleCollection1 = repository.findCollectionByUserId(userId);
+
+        assertEquals(collectionId, articleCollection1.getCollectionId());
     }
 }

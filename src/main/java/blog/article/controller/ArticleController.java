@@ -1,6 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.service.ArticleCollectionService;
 import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ public class ArticleController {
 
     @Autowired
     ArticleService articleService;
-
+    @Autowired
+    ArticleCollectionService articleCollectionService;
     private Instant converStringToInstant(String date){
         String pattern = "yyyy-MM-dd HH:mm";
 
@@ -112,6 +114,30 @@ public class ArticleController {
     @PutMapping("/{userId}/{articleId}")
     public ResponseEntity<String> recover(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
         boolean message = articleService.recover(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/collection/{userId}/{articleId}")
+    public ResponseEntity<String> addToCollection(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = articleCollectionService.addArticle(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/collection/{userId}/{articleId}")
+    public ResponseEntity<String> deleteFromCollection(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = articleCollectionService.deleteArticle(userId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
