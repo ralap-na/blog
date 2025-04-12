@@ -53,4 +53,8 @@ public class UserService {
 
         return true;
     }
+
+    public User getUser(String userId) {
+        return repository.findUserById(userId);
+    }
 }
