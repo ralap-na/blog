@@ -1,6 +1,7 @@
 package blog.repository;
 
 import blog.article.Article;
+import blog.article.Bookmark;
 import blog.article.Repository;
 import org.junit.jupiter.api.Test;
 
@@ -107,5 +108,17 @@ public class RepositoryTest {
         article.setDate(fixedTime);
         article.setDeleted(deleted);
         return article;
+    }
+
+    @Test
+    public void saveBookmark() {
+        String userId = "u1";
+        Bookmark bookmark = new Bookmark(userId);
+
+        repository.saveBookmark(bookmark);
+
+        Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
+
+        assertEquals(userId, bookmark1.getUserId());
     }
 }

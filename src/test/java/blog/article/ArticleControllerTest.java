@@ -31,6 +31,7 @@ class ArticleControllerTest {
         // 設定基礎 URL，RANDOM_PORT 會自動分配測試端口
         baseUrl = "/article";
 
+        repository.clear();
         repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
         repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
     }
@@ -270,6 +271,84 @@ class ArticleControllerTest {
         );
 
         // 檢查reponse status code 是否是 200 OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void addToBookmark() {
+        String userId = "u1";
+        String articleId = "a1";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteFromBookmark() {
+        String userId = "u1";
+        String articleId = "a1";
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article.setUserId(userId);
+        repository.saveArticle(article);
+
+        Bookmark bookmark = new Bookmark("u1");
+        repository.saveBookmark(bookmark);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                HttpMethod.DELETE,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void getArticleIdsFromBookmarkByUserId() {
+        Article article1 = new Article();
+        article1.setArticleId("a1");
+        article1.setUserId("u1");
+        repository.saveArticle(article1);
+
+        Article article2 = new Article();
+        article2.setArticleId("a2");
+        article2.setUserId("u1");
+        repository.saveArticle(article2);
+
+        String userId = "u1";
+        Bookmark bookmark = new Bookmark(userId);
+        repository.saveBookmark(bookmark);
+
+        bookmark.addArticle(article1.getArticleId());
+        bookmark.addArticle(article2.getArticleId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + userId,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }

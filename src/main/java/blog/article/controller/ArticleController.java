@@ -1,6 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/article")
@@ -19,7 +21,8 @@ public class ArticleController {
 
     @Autowired
     ArticleService articleService;
-
+    @Autowired
+    BookmarkService bookmarkService;
     private Instant converStringToInstant(String date){
         String pattern = "yyyy-MM-dd HH:mm";
 
@@ -115,6 +118,42 @@ public class ArticleController {
 
         if(message){
             return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> addToBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.addArticle(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/bookmark/{userId}/{articleId}")
+    public ResponseEntity<String> deleteFromBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.deleteArticle(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/bookmark/{userId}")
+    public ResponseEntity<List<String>> getArticleIdsFromBookmarkByUserId(@PathVariable String userId){
+        List<String> articleIds = bookmarkService.getArticleIds(userId);
+
+        if(articleIds != null){
+            return ResponseEntity.ok().body(articleIds);
         }
         else{
             return ResponseEntity.internalServerError().build();
