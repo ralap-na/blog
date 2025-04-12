@@ -87,7 +87,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
-      <version>${springboot.version}</version>
     </dependency>
 
     <!-- JUnit 5 -->
