@@ -43,6 +43,42 @@ public class ArticleController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Collection<Article>> getAllArticles(){
+        Collection<Article> articles = articleService.getAllArticles();
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/tag/{tag}")
+    public ResponseEntity<Collection<Article>> getArticlesByTag(@PathVariable String tag){
+        Collection<Article> articles = articleService.getArticlesByTag(tag);
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<Collection<Article>> getArticlesByCategory(@PathVariable String category){
+        Collection<Article> articles = articleService.getArticlesByCategory(category);
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/{articleId}")
     public ResponseEntity<Article> getArticle(@PathVariable String articleId){
         Article article = articleService.getArticle(articleId);

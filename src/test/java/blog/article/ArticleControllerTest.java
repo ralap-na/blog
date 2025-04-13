@@ -138,6 +138,103 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void getAllArticles(){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/all",
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+        assertEquals(2, articles.size());
+
+    }
+
+    @Test
+    public void getArticlesByTag(){
+        String tag = "Expected Tag";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/tag/" + tag,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+
+        // 驗證文章 tag 為 "Expected Tag"
+        for (Article article : articles) {
+            assertEquals(tag, article.getTag(), "Each article should belong to tag = \"Expected Tag\"");
+        }
+
+    }
+
+    @Test
+    public void getArticlesByCategory(){
+        String category = "Expected Category";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/category/" + category,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+
+        // 驗證文章 category 為 "Expected Category"
+        for (Article article : articles) {
+            assertEquals(category, article.getCategory(), "Each article should belong to tag = \"Expected Category\"");
+        }
+
+    }
+
+    @Test
     public void getArticlesByTitle(){
         String keyword = "Expected";
 

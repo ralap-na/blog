@@ -29,6 +29,33 @@ public class ArticleService {
 
     }
 
+    public Collection<Article> getAllArticles() {
+        Collection<Article> articles = repository.findAllArticles();
+        if(articles == null){
+            return null;
+        }
+
+        return articles;
+    }
+
+    public Collection<Article> getArticlesByTag(String tag) {
+        Collection<Article> articles = repository.findArticlesByTag(tag);
+        if(articles == null){
+            return null;
+        }
+
+        return articles;
+    }
+
+    public Collection<Article> getArticlesByCategory(String category) {
+        Collection<Article> articles = repository.findArticlesByCategory(category);
+        if(articles == null){
+            return null;
+        }
+
+        return articles;
+    }
+
     public Article getArticle(String articleId) {
         Article article = repository.findArticleById(articleId);
         if(article == null){

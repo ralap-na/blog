@@ -24,7 +24,7 @@ public class ArticleServiceTest {
 
     @BeforeEach
     void setUp() {
-//        repository.clear();
+        repository.clear();
         Article article = new Article();
         article.setUserId("1");
         article.setArticleId("1");
@@ -43,6 +43,36 @@ public class ArticleServiceTest {
         String articleId = articleService.create("1", "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
+    }
+
+    @Test
+    public void getAllArticles(){
+        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+
+
+        Collection<Article> articles = articleService.getAllArticles();
+
+        assertEquals(2, articles.size());
+    }
+
+    @Test
+    public void getArticlesByTag(){
+        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+
+
+        Collection<Article> articles = articleService.getArticlesByTag("Other Tag");
+
+        assertEquals(1, articles.size());
+    }
+
+    @Test
+    public void getArticlesByCategory(){
+        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+
+
+        Collection<Article> articles = articleService.getArticlesByCategory("Other Category");
+
+        assertEquals(1, articles.size());
     }
 
     @Test
