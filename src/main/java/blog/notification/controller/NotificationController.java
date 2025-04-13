@@ -1,5 +1,7 @@
 package blog.notification.controller;
 
+import blog.common.OperationOutcome;
+import blog.common.OutcomeState;
 import blog.notification.entity.Notification;
 import blog.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/notifications")
@@ -21,17 +24,18 @@ public class NotificationController {
     }
 
     @GetMapping("/{notificationId}")
-    public Notification getNotification(@PathVariable("notificationId") String notificationId) {
+    public Optional<Notification> getNotification(@PathVariable("notificationId") String notificationId) {
         return notificationService.getNotification(notificationId);
     }
 
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<String> deleteNotification(@PathVariable("notificationId") String notificationId) {
-        boolean message = notificationService.removeNotification(notificationId);
+        OperationOutcome outcome = notificationService.removeNotification(notificationId);
 
-        if (message) {
-            return ResponseEntity.ok("Deleted notification successfully");
-        } else {
+        if(outcome.getState().equals(OutcomeState.SUCCESS)){
+            return ResponseEntity.ok().build();
+        }
+        else{
             return ResponseEntity.internalServerError().build();
         }
     }

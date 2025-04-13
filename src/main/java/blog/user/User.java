@@ -1,6 +1,14 @@
 package blog.user;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class User {
+
+    @Id
     private String userId;
     private String username;
     private String password;
@@ -9,6 +17,10 @@ public class User {
         this.userId = userId;
         this.username = username;
         this.password = password;
+    }
+
+    public User() {
+
     }
 
     public String getUserId() {

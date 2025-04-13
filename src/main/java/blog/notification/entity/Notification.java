@@ -1,13 +1,26 @@
 package blog.notification.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.Instant;
 
+@Entity
+@Table(name = "notifications")
 public class Notification {
+
+    @Id
     private String notificationId;
+
     private String userId;
     private String title;
     private String content;
     private Instant date;
+
+    public Notification() {
+
+    }
 
     public Notification(String notificationId, String userId, String title, String content, Instant date) {
         if (notificationId == null || userId == null || title == null || content == null || date == null) {
