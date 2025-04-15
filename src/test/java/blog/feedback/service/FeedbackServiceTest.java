@@ -1,31 +1,23 @@
 package blog.feedback.service;
 
-import blog.article.Repository;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class FeedbackServiceTest {
     @Autowired
-    private Repository repository;
     private FeedbackService feedbackService;
 
     private final String articleId = "articleId";
     private final String userId = "testerId";
     private final String content = "This is the original content of the comment.";
-
-    @BeforeEach
-    public void setUp() {
-        feedbackService = new FeedbackService(repository);
-    }
 
     @Test
     public void create_a_comment() {

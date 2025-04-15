@@ -5,13 +5,16 @@ import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class FeedbackService {
+    @Autowired
     private final Repository repository;
 
     public FeedbackService(Repository repository) {
@@ -54,6 +57,18 @@ public class FeedbackService {
         return OperationOutcome.create().setId(id).setState(OutcomeState.SUCCESS);
     }
 
+    public List<Comment> getCommentsByArticleId(String articleId) {
+        return repository.findCommentsByArticleId(articleId);
+    }
+
+    public List<Comment> getAllComments() {
+        return repository.findAllComments();
+    }
+
+    public Comment getCommentById(String commentId) {
+        return repository.findCommentById(commentId);
+    }
+
     public OperationOutcome addReaction(String articleId, String userId, String type) {
         String reactionId = UUID.randomUUID().toString();
         Reaction reaction = new Reaction(reactionId, articleId, userId, type);
@@ -74,5 +89,17 @@ public class FeedbackService {
 
         repository.deleteReaction(reactionId);
         return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
+    }
+
+    public List<Reaction> getReactionsByArticleId(String articleId) {
+        return repository.findReactionsByArticleId(articleId);
+    }
+
+    public List<Reaction> getAllReactions() {
+        return repository.findAllReactions();
+    }
+
+    public Reaction getReactionById(String reactionId) {
+        return repository.findReactionById(reactionId);
     }
 }
