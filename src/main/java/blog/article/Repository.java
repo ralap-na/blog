@@ -88,8 +88,28 @@ public class Repository {
         return CommentList.get(commentId);
     }
 
+    public List<Comment> findCommentsByArticleId(String articleId){
+        return CommentList.values().stream()
+                .filter(comment -> comment.getArticleId().equals(articleId))
+                .toList();
+    }
+
+    public List<Comment> findAllComments(){
+        return CommentList.values().stream().toList();
+    }
+
+    public List<Reaction> findReactionsByArticleId(String articleId){
+        return ReactionList.values().stream()
+                .filter(reaction -> reaction.getArticleId().equals(articleId))
+                .toList();
+    }
+
     public Reaction findReactionById(String reactionId){
         return ReactionList.get(reactionId);
+    }
+
+    public List<Reaction> findAllReactions(){
+        return ReactionList.values().stream().toList();
     }
 
     public void saveComment(Comment comment) {
