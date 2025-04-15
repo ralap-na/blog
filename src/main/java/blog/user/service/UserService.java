@@ -47,7 +47,8 @@ public class UserService {
     public boolean updateUser(String userId, String username, String password) {
         User user = repository.findUserById(userId);
 
-        user.update(username, password);
+        String hashPassword = passwordEncoder.encode(password);
+        user.update(username, hashPassword);
 
         repository.saveUser(user);
 

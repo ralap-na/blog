@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 
-@RestController("/feedback")
+@RestController
+@RequestMapping("/feedback")
 public class FeedbackController {
     @Autowired
     FeedbackService feedbackService;
