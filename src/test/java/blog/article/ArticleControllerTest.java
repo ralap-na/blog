@@ -167,6 +167,37 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void getAllDeletedArticles(){
+        repository.delete("1");
+        repository.delete("2");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<Collection<Article>> response = restTemplate.exchange(
+                baseUrl + "/all/deleted",
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<Collection<Article>>() {}
+        );
+
+        Collection<Article> articles = response.getBody();
+
+        // 驗證狀態碼
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 驗證 body 不為 null
+        assertNotNull(articles);
+
+        // 驗證回傳文章數量大於 0
+        assertFalse(articles.isEmpty());
+
+        assertEquals(2, articles.size());
+
+    }
+
+    @Test
     public void getArticlesByTag(){
         String tag = "Expected Tag";
 

@@ -23,13 +23,17 @@ public class Repository {
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
 
-
     public void clear(){
         articleList.clear();
+        deletedArticleList.clear();
     }
 
     public Collection<Article> findAllArticles(){
         return articleList.values();
+    }
+
+    public Collection<Article> findAllDeletedArticles(){
+        return deletedArticleList.values();
     }
 
     public Article findArticleById(String articleId){
