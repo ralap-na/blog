@@ -167,16 +167,17 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void getAllDeletedArticles(){
+    public void getAllDeletedArticlesByUserId(){
         repository.delete("1");
-        repository.delete("2");
+
+        String userId = "1";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<Collection<Article>> response = restTemplate.exchange(
-                baseUrl + "/all/deleted",
+                baseUrl + "/all/deleted/" + userId,
                 HttpMethod.GET,
                 request,
                 new ParameterizedTypeReference<Collection<Article>>() {}
@@ -193,7 +194,7 @@ class ArticleControllerTest {
         // 驗證回傳文章數量大於 0
         assertFalse(articles.isEmpty());
 
-        assertEquals(2, articles.size());
+        assertEquals(1, articles.size());
 
     }
 

@@ -43,7 +43,7 @@ public class RepositoryTest {
     }
 
     @Test
-    public void findAllDeletedArticles(){
+    public void findAllDeletedArticlesByUserId(){
         Article article = buildTestArticle("1", "A", false);
         Article article2 = buildTestArticle("2", "B", false);
 
@@ -52,12 +52,13 @@ public class RepositoryTest {
         repository.delete("1");
         repository.delete("2");
 
-        Collection<Article> articles = repository.findAllDeletedArticles();
+        Collection<Article> articles = repository.findAllDeletedArticlesByUserId("2");
 
-        assertEquals(2, articles.size());
+        assertEquals(1, articles.size());
 
         for(Article a : articles){
             assertTrue(a.getDeleted());
+            assertEquals("2", a.getUserId());
         }
     }
 
