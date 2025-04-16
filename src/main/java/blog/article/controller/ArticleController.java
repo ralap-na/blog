@@ -55,6 +55,18 @@ public class ArticleController {
         }
     }
 
+    @GetMapping("/all/deleted")
+    public ResponseEntity<Collection<Article>> getAllDeletedArticles(){
+        Collection<Article> articles = articleService.getAllDeletedArticles();
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/tag/{tag}")
     public ResponseEntity<Collection<Article>> getArticlesByTag(@PathVariable String tag){
         Collection<Article> articles = articleService.getArticlesByTag(tag);

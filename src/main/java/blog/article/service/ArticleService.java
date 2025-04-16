@@ -38,6 +38,15 @@ public class ArticleService {
         return articles;
     }
 
+    public Collection<Article> getAllDeletedArticles() {
+        Collection<Article> articles = repository.findAllDeletedArticles();
+        if(articles == null){
+            return null;
+        }
+
+        return articles;
+    }
+
     public Collection<Article> getArticlesByTag(String tag) {
         Collection<Article> articles = repository.findArticlesByTag(tag);
         if(articles == null){

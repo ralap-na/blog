@@ -56,6 +56,18 @@ public class ArticleServiceTest {
     }
 
     @Test
+    public void getAllDeletedArticles(){
+        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+
+        repository.delete("1");
+        repository.delete("2");
+
+        Collection<Article> articles = articleService.getAllDeletedArticles();
+
+        assertEquals(2, articles.size());
+    }
+
+    @Test
     public void getArticlesByTag(){
         repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
 

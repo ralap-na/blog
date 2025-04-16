@@ -43,6 +43,25 @@ public class RepositoryTest {
     }
 
     @Test
+    public void findAllDeletedArticles(){
+        Article article = buildTestArticle("1", "A", false);
+        Article article2 = buildTestArticle("2", "B", false);
+
+        repository.saveArticle(article);
+        repository.saveArticle(article2);
+        repository.delete("1");
+        repository.delete("2");
+
+        Collection<Article> articles = repository.findAllDeletedArticles();
+
+        assertEquals(2, articles.size());
+
+        for(Article a : articles){
+            assertTrue(a.getDeleted());
+        }
+    }
+
+    @Test
     public void findArticlesByTag(){
         Article article = buildTestArticle("1", "A", false);
         Article article2 = buildTestArticle("2", "B", false);
