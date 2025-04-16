@@ -55,9 +55,9 @@ public class ArticleController {
         }
     }
 
-    @GetMapping("/all/deleted")
-    public ResponseEntity<Collection<Article>> getAllDeletedArticles(){
-        Collection<Article> articles = articleService.getAllDeletedArticles();
+    @GetMapping("/all/deleted/{userId}")
+    public ResponseEntity<Collection<Article>> getAllDeletedArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
 
         if(articles != null){
             return ResponseEntity.ok().body(articles);

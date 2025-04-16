@@ -38,8 +38,8 @@ public class ArticleService {
         return articles;
     }
 
-    public Collection<Article> getAllDeletedArticles() {
-        Collection<Article> articles = repository.findAllDeletedArticles();
+    public Collection<Article> getAllDeletedArticlesByUserId(String userId) {
+        Collection<Article> articles = repository.findAllDeletedArticlesByUserId(userId);
         if(articles == null){
             return null;
         }

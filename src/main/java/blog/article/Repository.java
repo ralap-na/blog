@@ -32,8 +32,10 @@ public class Repository {
         return articleList.values();
     }
 
-    public Collection<Article> findAllDeletedArticles(){
-        return deletedArticleList.values();
+    public Collection<Article> findAllDeletedArticlesByUserId(String userId){
+        Collection<Article> articles = deletedArticleList.values();
+        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
+        return articles;
     }
 
     public Article findArticleById(String articleId){

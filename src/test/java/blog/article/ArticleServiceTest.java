@@ -56,15 +56,15 @@ public class ArticleServiceTest {
     }
 
     @Test
-    public void getAllDeletedArticles(){
+    public void getAllDeletedArticlesByUserId(){
         repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
 
         repository.delete("1");
         repository.delete("2");
 
-        Collection<Article> articles = articleService.getAllDeletedArticles();
+        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId("2");
 
-        assertEquals(2, articles.size());
+        assertEquals(1, articles.size());
     }
 
     @Test
