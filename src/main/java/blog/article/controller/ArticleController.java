@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +56,35 @@ public class ArticleController {
         else{
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/condition")
+    public ResponseEntity<Collection<Article>> getArticlesByConditions(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String tag) {
+
+        try {
+            if (tag != null) {
+                tag = URLDecoder.decode(tag, StandardCharsets.UTF_8.name());
+            }
+            if (category != null) {
+                category = URLDecoder.decode(category, StandardCharsets.UTF_8.name());
+            }
+            if (title != null) {
+                title = URLDecoder.decode(title, StandardCharsets.UTF_8.name());
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        Collection<Article> articles = articleService.getArticlesByConditions(title, category, tag);
+
+        if (articles == null || articles.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(articles);
     }
 
     @GetMapping("/all/deleted/{userId}")
