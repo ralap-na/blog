@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class ArticleService {
@@ -47,6 +49,40 @@ public class ArticleService {
         return articles;
     }
 
+    public Collection<Article> getArticlesByConditions(String title, String category, String tag) {
+        List<Collection<Article>> filters = new ArrayList<>();
+
+        if (tag != null && !tag.isEmpty()) {
+            Collection<Article> tagArticles = repository.findArticlesByTag(tag);
+            if (tagArticles == null) return null;
+            filters.add(tagArticles);
+        }
+
+        if (category != null && !category.isEmpty()) {
+            Collection<Article> categoryArticles = repository.findArticlesByCategory(category);
+            if (categoryArticles == null) return null;
+            filters.add(categoryArticles);
+        }
+
+        if (title != null && !title.isEmpty()) {
+            Collection<Article> titleArticles = repository.findArticlesByTitle(title);
+            if (titleArticles == null) return null;
+            filters.add(titleArticles);
+        }
+
+        if (filters.isEmpty()) {
+            return null;
+        }
+
+        Collection<Article> result = new ArrayList<>(filters.get(0));
+        for (int i = 1; i < filters.size(); i++) {
+            result.retainAll(filters.get(i));
+        }
+
+        return result;
+    }
+
+
     public Collection<Article> getArticlesByTag(String tag) {
         Collection<Article> articles = repository.findArticlesByTag(tag);
         if(articles == null){
@@ -58,6 +94,16 @@ public class ArticleService {
 
     public Collection<Article> getArticlesByCategory(String category) {
         Collection<Article> articles = repository.findArticlesByCategory(category);
+        if(articles == null){
+            return null;
+        }
+
+        return articles;
+    }
+
+    public Collection<Article> getArticlesByTitle(String keyword){
+        Collection<Article> articles = repository.findArticlesByTitle(keyword);
+
         if(articles == null){
             return null;
         }
@@ -77,11 +123,6 @@ public class ArticleService {
     public Collection<Article> getArticlesByUserId(String userId){
 
         return repository.findArticlesByUserId(userId);
-    }
-
-    public Collection<Article> getArticlesByTitle(String keyword){
-
-        return repository.findArticlesByTitle(keyword);
     }
 
     public Boolean update(String articleId, String title, String content, String tag, String category){

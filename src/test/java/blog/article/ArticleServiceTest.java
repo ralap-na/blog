@@ -68,23 +68,18 @@ public class ArticleServiceTest {
     }
 
     @Test
-    public void getArticlesByTag(){
+    public void getArticlesByConditions(){
         repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
 
 
-        Collection<Article> articles = articleService.getArticlesByTag("Other Tag");
+        Collection<Article> articles = articleService.getArticlesByConditions("Other Title", "Other Category", "Other Tag");
 
         assertEquals(1, articles.size());
-    }
 
-    @Test
-    public void getArticlesByCategory(){
-        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
-
-
-        Collection<Article> articles = articleService.getArticlesByCategory("Other Category");
-
-        assertEquals(1, articles.size());
+        Article article = articles.stream().toList().get(0);
+        assertEquals("Other Title", article.getTitle());
+        assertEquals("Other Tag", article.getTag());
+        assertEquals("Other Category", article.getCategory());
     }
 
     @Test
@@ -111,17 +106,6 @@ public class ArticleServiceTest {
         Collection<Article> articles = articleService.getArticlesByUserId("1");
         for(Article a : articles){
             assertEquals("1", a.getUserId());
-        }
-    }
-
-    @Test
-    public void getArticlesByTitle(){
-        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", fixedTime, false));
-
-        Collection<Article> articles = articleService.getArticlesByTitle("Expected");
-
-        for(Article a : articles){
-            assertTrue(a.getTitle().contains("Expected"));
         }
     }
 
