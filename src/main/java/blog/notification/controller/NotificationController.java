@@ -17,7 +17,7 @@ public class NotificationController {
     @Autowired
     NotificationService notificationService;
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable("userId") String userId) {
         List<Notification> notifications = notificationService.getUserNotifications(userId);
 

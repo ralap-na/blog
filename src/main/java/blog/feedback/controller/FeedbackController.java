@@ -25,9 +25,9 @@ public class FeedbackController {
     @PostMapping("/{writerId}/{articleId}/{readerId}/comment-edited")
     public ResponseEntity<String> createComment(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId,@RequestBody String content){
         OperationOutcome outcome = feedbackService.createComment(articleId, readerId, content, Instant.now());
-        boolean isNotificationSent = notificationService.notifyUser(writerId, articleId, "You have received a comment!", "", Instant.now());
+        OperationOutcome isNotificationSent = notificationService.notifyUser(writerId, articleId, "You have received a comment!", "", Instant.now());
 
-        if(outcome.getState().equals(OutcomeState.SUCCESS) && isNotificationSent){
+        if(outcome.getState().equals(OutcomeState.SUCCESS) && isNotificationSent.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
         else{
