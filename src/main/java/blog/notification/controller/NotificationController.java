@@ -1,5 +1,7 @@
 package blog.notification.controller;
 
+import blog.common.OperationOutcome;
+import blog.common.OutcomeState;
 import blog.notification.entity.Notification;
 import blog.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +18,32 @@ public class NotificationController {
     NotificationService notificationService;
 
     @GetMapping("/user/{userId}")
-    public List<Notification> getUserNotifications(@PathVariable("userId") String userId) {
-        return notificationService.getUserNotifications(userId);
+    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable("userId") String userId) {
+        List<Notification> notifications = notificationService.getUserNotifications(userId);
+
+        if (notifications != null) {
+            return ResponseEntity.ok(notifications);
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 
     @GetMapping("/{notificationId}")
-    public Notification getNotification(@PathVariable("notificationId") String notificationId) {
-        return notificationService.getNotification(notificationId);
+    public ResponseEntity<Notification> getNotification(@PathVariable("notificationId") String notificationId) {
+        Notification notification =  notificationService.getNotification(notificationId);
+        if (notification != null) {
+            return ResponseEntity.ok(notification);
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<String> deleteNotification(@PathVariable("notificationId") String notificationId) {
-        boolean message = notificationService.removeNotification(notificationId);
+        OperationOutcome outcome = notificationService.removeNotification(notificationId);
 
-        if (message) {
+        if (outcome.getState() == OutcomeState.SUCCESS) {
             return ResponseEntity.ok("Deleted notification successfully");
         } else {
             return ResponseEntity.internalServerError().build();
