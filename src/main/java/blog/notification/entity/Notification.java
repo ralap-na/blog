@@ -4,16 +4,17 @@ import java.time.Instant;
 
 public class Notification {
     private String notificationId;
+    private String articleId;
     private String userId;
     private String title;
     private String content;
     private Instant date;
 
-    public Notification(String notificationId, String userId, String title, String content, Instant date) {
-        if (notificationId == null || userId == null || title == null || content == null || date == null) {
+    public Notification(String notificationId, String userId, String articleId, String title, String content, Instant date) {
+        if (notificationId == null || articleId == null || userId == null || title == null || content == null || date == null) {
             throw new IllegalArgumentException("All fields must be non-null");
         }
-        if (notificationId.isEmpty() || userId.isEmpty() || title.isEmpty() || content.isEmpty()) {
+        if (notificationId.isEmpty() || articleId.isEmpty() || userId.isEmpty() || title.isEmpty() || content.isEmpty()) {
             throw new IllegalArgumentException("All fields must be non-empty");
         }
         if (date.isAfter(Instant.now())) {
@@ -21,6 +22,7 @@ public class Notification {
         }
 
         this.notificationId = notificationId;
+        this.articleId = articleId;
         this.userId = userId;
         this.title = title;
         this.content = content;
@@ -41,6 +43,14 @@ public class Notification {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(String articleId) {
+        this.articleId = articleId;
     }
 
     public String getTitle() {
