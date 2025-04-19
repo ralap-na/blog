@@ -36,6 +36,10 @@ public class ArticleController {
         String category = jsonObject.getString("category");
         Instant date = Instant.parse(jsonObject.getString("date"));
 
+        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
+            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+        }
+
         articleId = articleService.create(userId, articleId, title, content, tag, category, date);
 
         if(articleId != null){
@@ -158,6 +162,10 @@ public class ArticleController {
         String content = jsonObject.getString("content");
         String tag = jsonObject.getString("tag");
         String category = jsonObject.getString("category");
+
+        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
+            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+        }
 
         Boolean message = articleService.update(articleId, title, content, tag, category);
 

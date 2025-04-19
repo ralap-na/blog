@@ -75,6 +75,36 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void createArticleFail() {
+        // 準備測試文章
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("userId", "1");
+        requestBody.put("articleId", "3");
+        requestBody.put("title", "");
+        requestBody.put("content", "Created Content");
+        requestBody.put("tag", "Created tag");
+        requestBody.put("category", "Created category");
+        requestBody.put("date", "2025-04-12T15:30:24.517Z");
+
+        // 設定Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+
+        // 發送 POST request
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
+    }
+
+    @Test
     public void getArticleSuccess() throws JSONException {
         String articleId = "1";
 
@@ -268,7 +298,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    void updateArticleFailure() {
+    void updateArticleWithInValidIdFailure() {
         // 準備測試文章
         String articleId = "999";
         JSONObject requestBody = new JSONObject();
@@ -292,6 +322,34 @@ class ArticleControllerTest {
 
         // 檢查reponse status code 是否是 500 Internal Server Error
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void updateArticleWithInValidDataFailure() {
+        // 準備測試文章
+        String articleId = "1";
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("title", "");
+        requestBody.put("content", "");
+        requestBody.put("tag", "invalid");
+        requestBody.put("category", "");
+
+        // 設定Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+
+        // 發送 PUT request
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/" + articleId,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
     }
 
     @Test
