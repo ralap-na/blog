@@ -1,24 +1,30 @@
 package blog.feedback;
 
 public class Reaction {
-    private String id;
+    private final String id;
     private String userId;
     private String articleId;
-    private String type;
+    private final String commentId;
+    private final String type;
 
     public Reaction(String id, String userId, String articleId, String type) {
         this.id = id;
         this.userId = userId;
         this.articleId = articleId;
         this.type = type;
+        commentId = null;
+    }
+
+    public Reaction(String id, String userId, String articleId, String commentId, String type) {
+        this.id = id;
+        this.userId = userId;
+        this.articleId = articleId;
+        this.commentId = commentId;
+        this.type = type;
     }
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUserId() {
@@ -33,15 +39,15 @@ public class Reaction {
         return articleId;
     }
 
+    public String getCommentId() {
+        return commentId;
+    }
+
     public void setArticleId(String articleId) {
         this.articleId = articleId;
     }
 
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }
