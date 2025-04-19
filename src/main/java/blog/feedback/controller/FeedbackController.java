@@ -95,6 +95,18 @@ public class FeedbackController {
         }
     }
 
+    @GetMapping("/{articleId}/{commentId}/reactions")
+    public ResponseEntity<List<Reaction>> getReactionsByCommentId(@PathVariable("articleId") String articleId, @PathVariable("commentId") String commentId) {
+        List<Reaction> reactions = feedbackService.getReactionsByCommentId(articleId, commentId);
+
+        if(reactions != null){
+            return ResponseEntity.ok().body(reactions);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/reactions")
     public ResponseEntity<List<Reaction>> getAllReactions() {
         List<Reaction> reactions = feedbackService.getAllReactions();
@@ -120,8 +132,21 @@ public class FeedbackController {
     }
 
     @PostMapping("/{writerId}/{articleId}/{readerId}/add-reaction")
-    public ResponseEntity<String> addReaction(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId, @RequestBody String type){
-        OperationOutcome feedbackOutcome = feedbackService.addReaction(articleId, readerId, type);
+    public ResponseEntity<String> addReactionOnArticle(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId, @RequestBody String type){
+        OperationOutcome feedbackOutcome = feedbackService.addReactionOnArticle(articleId, readerId, type);
+        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a reaction!", "Someone " + type + " your article!", Instant.now());
+
+        if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/{writerId}/{articleId}/{commentId}/{readerId}/add-reaction")
+    public ResponseEntity<String> addReactionOnComment(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String commentId, @PathVariable String readerId, @RequestBody String type){
+        OperationOutcome feedbackOutcome = feedbackService.addReactionOnComment(articleId, commentId, readerId, type);
         OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a reaction!", "Someone " + type + " your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
