@@ -71,14 +71,14 @@ public class FeedbackService {
 
     public OperationOutcome addReactionOnArticle(String articleId, String userId, String type) {
         String reactionId = UUID.randomUUID().toString();
-        Reaction reaction = new Reaction(reactionId, articleId, userId, type);
+        Reaction reaction = new Reaction(reactionId, userId, articleId, type);
         repository.saveReaction(reaction);
         return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
     }
 
     public OperationOutcome addReactionOnComment(String articleId, String commentId, String userId, String type) {
         String reactionId = UUID.randomUUID().toString();
-        Reaction reaction = new Reaction(reactionId, articleId, commentId, userId, type);
+        Reaction reaction = new Reaction(reactionId, userId, articleId, commentId, type);
         repository.saveReaction(reaction);
         return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
     }
