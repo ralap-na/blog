@@ -1,8 +1,10 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.Category;
 import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
+import blog.article.service.CategoryService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ public class ArticleController {
     ArticleService articleService;
     @Autowired
     BookmarkService bookmarkService;
+    @Autowired
+    CategoryService categoryService;
 
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody String info){
@@ -235,5 +239,30 @@ public class ArticleController {
         else{
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PostMapping("/category/create")
+    public ResponseEntity<String> createCategory(@RequestParam String name) {
+        String response = categoryService.createCategory(name);
+        if (response.startsWith("Success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @DeleteMapping("/category/delete/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable String id) {
+        String response = categoryService.deleteCategory(id);
+        if (response.startsWith("Success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<Collection<Category>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }

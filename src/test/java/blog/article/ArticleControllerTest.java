@@ -9,10 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -470,5 +473,97 @@ class ArticleControllerTest {
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void createCategorySuccess() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("name", "Health");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/category/create",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().startsWith("Success"));
+        assertTrue(repository.findAllCategories().stream()
+                .anyMatch(c -> c.getName().equals("Health")));
+    }
+
+    @Test
+    public void createCategoryWithEmptyName_shouldFail() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("name", " "); // 空白名稱
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/category/create",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Error: Category name is required.", response.getBody());
+    }
+
+    @Test
+    public void deleteCategorySuccess() {
+        // 先新增一個 category 並取得 ID
+        Category category = new Category(UUID.randomUUID().toString(), "TempDelete");
+        repository.saveCategory(category);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/category/delete/" + category.getId(),
+                HttpMethod.DELETE,
+                null,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Success: Category deleted.", response.getBody());
+        assertNull(repository.findCategoryById(category.getId()));
+    }
+
+    @Test
+    public void deleteCategoryNotFound_shouldFail() {
+        String fakeId = "non-existent-id";
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/category/delete/" + fakeId,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Error: Category not found.", response.getBody());
+    }
+
+    @Test
+    public void getAllCategories_shouldReturnList() {
+        repository.saveCategory(new Category(UUID.randomUUID().toString(), "X"));
+        repository.saveCategory(new Category(UUID.randomUUID().toString(), "Y"));
+
+        ResponseEntity<Category[]> response = restTemplate.getForEntity(
+                baseUrl + "/category",
+                Category[].class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().length >= 2); // 根據初始化或額外新增的
     }
 }
