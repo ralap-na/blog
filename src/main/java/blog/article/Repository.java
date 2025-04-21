@@ -108,6 +108,12 @@ public class Repository {
                 .toList();
     }
 
+    public List<Reaction> findReactionsByCommentId(String articleId, String commentId){
+        return ReactionList.values().stream()
+                .filter(reaction -> reaction.getArticleId().equals(articleId) && reaction.getCommentId().equals(commentId))
+                .toList();
+    }
+
     public Reaction findReactionById(String reactionId){
         return ReactionList.get(reactionId);
     }

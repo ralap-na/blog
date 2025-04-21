@@ -69,9 +69,16 @@ public class FeedbackService {
         return repository.findCommentById(commentId);
     }
 
-    public OperationOutcome addReaction(String articleId, String userId, String type) {
+    public OperationOutcome addReactionOnArticle(String articleId, String userId, String type) {
         String reactionId = UUID.randomUUID().toString();
-        Reaction reaction = new Reaction(reactionId, articleId, userId, type);
+        Reaction reaction = new Reaction(reactionId, userId, articleId, type);
+        repository.saveReaction(reaction);
+        return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
+    }
+
+    public OperationOutcome addReactionOnComment(String articleId, String commentId, String userId, String type) {
+        String reactionId = UUID.randomUUID().toString();
+        Reaction reaction = new Reaction(reactionId, userId, articleId, commentId, type);
         repository.saveReaction(reaction);
         return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
     }
@@ -93,6 +100,10 @@ public class FeedbackService {
 
     public List<Reaction> getReactionsByArticleId(String articleId) {
         return repository.findReactionsByArticleId(articleId);
+    }
+
+    public List<Reaction> getReactionsByCommentId(String articleId, String commentId) {
+        return repository.findReactionsByCommentId(articleId, commentId);
     }
 
     public List<Reaction> getAllReactions() {
