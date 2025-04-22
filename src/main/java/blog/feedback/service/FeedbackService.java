@@ -32,29 +32,19 @@ public class FeedbackService {
         return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
     }
 
-    public OperationOutcome updateComment(String id, String userId, String content, Instant date) {
-        Comment comment = repository.findCommentById(id);
+    public OperationOutcome deleteComment(String commentId, String userId) {
+        Comment comment = repository.findCommentById(commentId);
 
-        if(comment == null) {
-            return OperationOutcome.create().setId(id).setMessage("Fail to find comment.").setState(OutcomeState.FAILURE);
+        if (comment == null) {
+            return OperationOutcome.create().setId(commentId).setMessage("Comment not found.").setState(OutcomeState.FAILURE);
         }
 
-        if (!userId.equals(comment.getUserId())) {
-            return OperationOutcome.create().setId(id).setMessage("Invalid user Id.").setState(OutcomeState.FAILURE);
+        if (!comment.getUserId().equals(userId)) {
+            return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
         }
 
-        if (content.equals(comment.getContent())) {
-            return OperationOutcome.create().setId(id).setState(OutcomeState.SUCCESS);
-        }
-
-        if(date.isBefore(comment.getDate())) {
-            return OperationOutcome.create().setId(id).setMessage("Time machine is not available.").setState(OutcomeState.FAILURE);
-        }
-
-        comment.update(content, date);
-        repository.saveComment(comment);
-
-        return OperationOutcome.create().setId(id).setState(OutcomeState.SUCCESS);
+        repository.deleteComment(commentId);
+        return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
     }
 
     public List<Comment> getCommentsByArticleId(String articleId) {
@@ -91,7 +81,7 @@ public class FeedbackService {
         }
 
         if (!userId.equals(reaction.getUserId())) {
-            return OperationOutcome.create().setId(reactionId).setMessage("Invalid user Id.").setState(OutcomeState.FAILURE);
+            return OperationOutcome.create().setId(reactionId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
         }
 
         repository.deleteReaction(reactionId);

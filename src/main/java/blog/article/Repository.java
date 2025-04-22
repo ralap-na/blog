@@ -88,6 +88,8 @@ public class Repository {
         articleList.put(articleId, article);
     }
 
+    // Comment
+
     public Comment findCommentById(String commentId){
         return CommentList.get(commentId);
     }
@@ -101,6 +103,16 @@ public class Repository {
     public List<Comment> findAllComments(){
         return CommentList.values().stream().toList();
     }
+
+    public void saveComment(Comment comment) {
+        CommentList.put(comment.getId(), comment);
+    }
+
+    public void deleteComment(String commentId) {
+        CommentList.remove(commentId);
+    }
+
+    // Reaction
 
     public List<Reaction> findReactionsByArticleId(String articleId){
         return ReactionList.values().stream()
@@ -122,10 +134,6 @@ public class Repository {
         return ReactionList.values().stream().toList();
     }
 
-    public void saveComment(Comment comment) {
-        CommentList.put(comment.getId(), comment);
-    }
-
     public void saveReaction(Reaction reaction) {
         ReactionList.put(reaction.getId(), reaction);
     }
@@ -133,6 +141,8 @@ public class Repository {
     public void deleteReaction(String reactionId) {
         ReactionList.remove(reactionId);
     }
+
+    // User
       
     public Optional<User> findUserByUsername(String username) {
         return userList.values().stream().filter(user -> user.getUsername().equals(username)).findAny();
