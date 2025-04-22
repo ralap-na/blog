@@ -27,7 +27,7 @@ public class FeedbackController {
     @PostMapping("/{writerId}/{articleId}/{readerId}/comment-edited")
     public ResponseEntity<String> createComment(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId,@RequestBody String content){
         OperationOutcome feedbackOutcome = feedbackService.createComment(articleId, readerId, content, Instant.now());
-        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a comment!", "Someone left a comment under your article!", Instant.now());
+        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "Someone left a comment under your article!", "Someone left a comment under your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
@@ -146,7 +146,7 @@ public class FeedbackController {
     @PostMapping("/{writerId}/{articleId}/{readerId}/add-reaction")
     public ResponseEntity<String> addReactionOnArticle(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId, @RequestBody String type){
         OperationOutcome feedbackOutcome = feedbackService.addReactionOnArticle(articleId, readerId, type);
-        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a reaction!", "Someone " + type + " your article!", Instant.now());
+        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "Someone " + type + " your article!", "Someone " + type + " your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
