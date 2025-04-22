@@ -29,16 +29,6 @@ public class NotificationController {
 
     }
 
-    @GetMapping("/{notificationId}")
-    public ResponseEntity<Notification> getNotification(@PathVariable("notificationId") String notificationId) {
-        Notification notification =  notificationService.getNotification(notificationId);
-        if (notification != null) {
-            return ResponseEntity.ok(notification);
-        } else {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<String> deleteNotification(@PathVariable("notificationId") String notificationId) {
         OperationOutcome outcome = notificationService.removeNotification(notificationId);

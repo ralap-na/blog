@@ -2,18 +2,27 @@ package blog.repository;
 
 import blog.article.Article;
 import blog.article.Bookmark;
+import blog.article.Category;
 import blog.article.Repository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RepositoryTest {
 
-    private final Repository repository = new Repository();
+    private Repository repository;
+
+    @BeforeEach
+    public void setUp() {
+        repository = new Repository();
+        repository.initDefaultCategories(); // 模擬 @PostConstruct 行為
+    }
 
     @Test
     public void saveArticle(){
@@ -183,5 +192,60 @@ public class RepositoryTest {
         Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
 
         assertEquals(userId, bookmark1.getUserId());
+    }
+
+    @Test
+    public void shouldInitializeDefaultCategories() {
+        Collection<Category> categories = repository.findAllCategories();
+
+        assertEquals(2, categories.size()); // 根據 DefaultCategory 有 5 個
+        assertTrue(categories.stream().anyMatch(c -> c.getName().equals("TECH")));
+    }
+
+    @Test
+    public void saveCategory() {
+        String id = UUID.randomUUID().toString();
+        Category category = new Category(id, "TestCategory");
+
+        repository.saveCategory(category);
+
+        Category saved = repository.findCategoryById(id);
+        assertNotNull(saved);
+        assertEquals("TestCategory", saved.getName());
+    }
+
+    @Test
+    public void findAllCategories() {
+        int initialSize = repository.findAllCategories().size();
+
+        Category category1 = new Category(UUID.randomUUID().toString(), "X");
+        Category category2 = new Category(UUID.randomUUID().toString(), "Y");
+
+        repository.saveCategory(category1);
+        repository.saveCategory(category2);
+
+        Collection<Category> all = repository.findAllCategories();
+
+        assertEquals(initialSize + 2, all.size());
+    }
+
+    @Test
+    public void deleteCategory() {
+        String id = UUID.randomUUID().toString();
+        Category category = new Category(id, "DeleteMe");
+
+        repository.saveCategory(category);
+        assertNotNull(repository.findCategoryById(id));
+
+        repository.deleteCategoryById(id);
+        assertNull(repository.findCategoryById(id));
+    }
+
+    @Test
+    public void deleteNonExistentCategory() {
+        String fakeId = UUID.randomUUID().toString();
+        repository.deleteCategoryById(fakeId); // 不會丟錯誤，但不影響 map
+
+        assertNull(repository.findCategoryById(fakeId));
     }
 }

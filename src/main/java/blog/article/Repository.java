@@ -4,13 +4,10 @@ import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
 import blog.user.User;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class Repository {
@@ -22,6 +19,7 @@ public class Repository {
     private final Map<String, Reaction> ReactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
+    private final Map<String, Category> categoryList = new HashMap<>();
 
     public void clear(){
         articleList.clear();
@@ -172,5 +170,30 @@ public class Repository {
 
     public Bookmark findBookmarkByUserId(String userId){
         return bookmarkList.get(userId);
+    }
+
+    @PostConstruct
+    public void initDefaultCategories() {
+        for (DefaultCategory dc : DefaultCategory.values()) {
+            String id = UUID.randomUUID().toString();
+            Category category = new Category(id, dc.name());
+            categoryList.put(id, category);
+        }
+    }
+
+    public void saveCategory(Category category) {
+        categoryList.put(category.getId(), category);
+    }
+
+    public Category findCategoryById(String id) {
+        return categoryList.get(id);
+    }
+
+    public Collection<Category> findAllCategories() {
+        return categoryList.values();
+    }
+
+    public boolean deleteCategoryById(String id) {
+        return categoryList.remove(id) != null;
     }
 }
