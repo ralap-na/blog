@@ -22,7 +22,7 @@ public class App
     @Bean
     public CommandLineRunner initAdmin(UserService userService) {
         return args -> {
-            userService.createUser("admin", "admin");
+            userService.createUser("Admin", "Admin");
         };
     }
 }
