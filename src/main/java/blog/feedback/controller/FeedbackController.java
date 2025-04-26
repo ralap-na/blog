@@ -37,7 +37,7 @@ public class FeedbackController {
         }
     }
 
-    @DeleteMapping("/{articleId}/{commentId}")
+    @DeleteMapping("/{articleId}/comment/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable String articleId, @PathVariable String commentId, HttpSession session){
         String userId = session.getAttribute("userId").toString();
 
@@ -169,7 +169,7 @@ public class FeedbackController {
         }
     }
 
-    @DeleteMapping("/{articleId}/{reactionId}")
+    @DeleteMapping("/{articleId}/reaction/{reactionId}")
     public ResponseEntity<String> deleteReaction(@PathVariable String articleId, @PathVariable String reactionId, HttpSession session){
         String userId = session.getAttribute("userId").toString();
 
