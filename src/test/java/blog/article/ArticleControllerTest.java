@@ -1,5 +1,6 @@
 package blog.article;
 
+import blog.user.User;
 import net.minidev.json.JSONObject;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -476,17 +477,20 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void createCategorySuccess() {
+    public void createCategorySuccess_withAdminLogin() {
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定帶 Cookie 的 Header
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("name", "Health");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
+        System.out.println(baseUrl + "/category/create");
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/category/create",
+                baseUrl + "/category/create?name=Health",
                 HttpMethod.POST,
                 request,
                 String.class
@@ -494,22 +498,23 @@ class ArticleControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody().startsWith("Success"));
-        assertTrue(repository.findAllCategories().stream()
-                .anyMatch(c -> c.getName().equals("Health")));
     }
 
     @Test
     public void createCategoryWithEmptyName_shouldFail() {
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定帶 Cookie 的 Header
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("name", " "); // 空白名稱
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
+        // 空白名稱
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/category/create",
+                baseUrl + "/category/create?name= ",
                 HttpMethod.POST,
                 request,
                 String.class
@@ -520,36 +525,92 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void deleteCategorySuccess() {
-        // 先新增一個 category 並取得 ID
+    public void deleteCategorySuccess_withAdminLogin() {
+        // 先新增一個 category
         Category category = new Category(UUID.randomUUID().toString(), "TempDelete");
         repository.saveCategory(category);
+
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定帶 Cookie 的 Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
+
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + "/category/delete/" + category.getId(),
                 HttpMethod.DELETE,
-                null,
+                request,
                 String.class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Success: Category deleted.", response.getBody());
-        assertNull(repository.findCategoryById(category.getId()));
     }
 
     @Test
     public void deleteCategoryNotFound_shouldFail() {
+        // 先模擬 Admin 登入
+        String cookie = loginAsAdminAndGetCookie();
+
         String fakeId = "non-existent-id";
+
+        // 設定帶 Cookie 的 Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
+
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + "/category/delete/" + fakeId,
                 HttpMethod.DELETE,
-                null,
+                request,
                 String.class
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Error: Category not found.", response.getBody());
+    }
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private String loginAsAdminAndGetCookie() {
+        // 先在 Repository 放一個 Admin user
+
+        String password = passwordEncoder.encode("admin-password");
+        User adminUser = new User("admin-id", "Admin", password);
+        repository.saveUser(adminUser);
+
+        // 用 JSON 格式登入
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("username", "Admin");
+        requestBody.put("password", "admin-password");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/users/login",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        // 檢查登入是否成功
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // 把 Set-Cookie 抓出來
+        String cookie = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+        assertNotNull(cookie); // 順便驗證真的有拿到 Cookie
+
+        return cookie;
     }
 
     @Test

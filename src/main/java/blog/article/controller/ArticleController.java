@@ -1,12 +1,15 @@
 package blog.article.controller;
 
 import blog.article.Article;
-import blog.article.Category;
 import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import blog.article.service.CategoryService;
+import blog.user.User;
+import blog.user.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +32,8 @@ public class ArticleController {
     BookmarkService bookmarkService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    UserService userService;
 
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody String info){
@@ -241,28 +247,57 @@ public class ArticleController {
         }
     }
 
+
     @PostMapping("/category/create")
-    public ResponseEntity<String> createCategory(@RequestParam String name) {
-        String response = categoryService.createCategory(name);
-        if (response.startsWith("Success")) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<String> createCategory(@RequestParam String name, HttpSession session) {
+
+        String userId = (String) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+
+        User user = userService.getUser(userId);
+
+        if(Objects.equals(user.getUsername(), "Admin")){
+            String response = categoryService.createCategory(name);
+            if (response.startsWith("Success")) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Only Admin can create category.");
         }
     }
 
     @DeleteMapping("/category/delete/{id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable String id) {
-        String response = categoryService.deleteCategory(id);
-        if (response.startsWith("Success")) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<String> deleteCategory(@PathVariable String id, HttpSession session) {
+
+        String userId = (String) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+
+        User user = userService.getUser(userId);
+
+        if(Objects.equals(user.getUsername(), "Admin")){
+            String response = categoryService.deleteCategory(id);
+            if (response.startsWith("Success")) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Only Admin can delete category.");
         }
     }
 
     @GetMapping("/category")
-    public ResponseEntity<Collection<Category>> getAllCategories() {
+    public ResponseEntity<Object> getAllCategories(HttpSession session) {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }
