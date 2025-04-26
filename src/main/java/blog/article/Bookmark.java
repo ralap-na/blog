@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bookmark {
+    private String bookmarkId;
+    private String bookmarkName;
     private String userId;
     private List<String> articleIds;
 
     public Bookmark(){}
 
-    public Bookmark(String userId) {
+    public Bookmark(String bookmarkId, String bookmarkName, String userId) {
+        this.bookmarkId = bookmarkId;
+        this.bookmarkName = bookmarkName;
         this.userId = userId;
         this.articleIds = new ArrayList<>();
     }
@@ -36,5 +40,13 @@ public class Bookmark {
 
     public List<String> getArticleIds() {
         return articleIds;
+    }
+
+    public String getBookmarkId() {
+        return bookmarkId;
+    }
+
+    public String getBookmarkName() {
+        return bookmarkName;
     }
 }

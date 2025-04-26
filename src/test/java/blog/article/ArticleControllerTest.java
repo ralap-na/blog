@@ -401,6 +401,10 @@ class ArticleControllerTest {
     @Test
     public void addToBookmark() {
         String userId = "u1";
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
+        repository.saveBookmark(bookmark);
         String articleId = "a1";
 
         HttpHeaders headers = new HttpHeaders();
@@ -408,7 +412,7 @@ class ArticleControllerTest {
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                baseUrl + "/bookmark/" + bookmarkId + "/" + articleId,
                 HttpMethod.PUT,
                 request,
                 String.class
@@ -426,7 +430,10 @@ class ArticleControllerTest {
         article.setUserId(userId);
         repository.saveArticle(article);
 
-        Bookmark bookmark = new Bookmark("u1");
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
+        bookmark.addArticle(article.getArticleId());
         repository.saveBookmark(bookmark);
 
         HttpHeaders headers = new HttpHeaders();
@@ -434,7 +441,7 @@ class ArticleControllerTest {
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/bookmark/" + userId + "/" + articleId,
+                baseUrl + "/bookmark/" + bookmarkId + "/" + articleId,
                 HttpMethod.DELETE,
                 request,
                 String.class
@@ -444,7 +451,7 @@ class ArticleControllerTest {
     }
 
     @Test
-    public void getArticleIdsFromBookmarkByUserId() {
+    public void getArticleIdsFromBookmarkByBookmarkId() {
         Article article1 = new Article();
         article1.setArticleId("a1");
         article1.setUserId("u1");
@@ -456,11 +463,39 @@ class ArticleControllerTest {
         repository.saveArticle(article2);
 
         String userId = "u1";
-        Bookmark bookmark = new Bookmark(userId);
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
         repository.saveBookmark(bookmark);
 
         bookmark.addArticle(article1.getArticleId());
         bookmark.addArticle(article2.getArticleId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + bookmarkId,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void getBookmarksByUserId() {
+        String userId = "u1";
+        String bookmarkId_1 = "b1";
+        String bookmarkName_1 = "Bookmark-1";
+        String bookmarkId_2 = "b2";
+        String bookmarkName_2 = "Bookmark-2";
+        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1, userId);
+        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2, userId);
+        repository.saveBookmark(bookmark_1);
+        repository.saveBookmark(bookmark_2);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

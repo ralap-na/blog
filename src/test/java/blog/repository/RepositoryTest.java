@@ -185,11 +185,13 @@ public class RepositoryTest {
     @Test
     public void saveBookmark() {
         String userId = "u1";
-        Bookmark bookmark = new Bookmark(userId);
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
 
         repository.saveBookmark(bookmark);
 
-        Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
+        Bookmark bookmark1 = repository.findBookmarkByBookmarkId(bookmarkId);
 
         assertEquals(userId, bookmark1.getUserId());
     }

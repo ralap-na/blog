@@ -175,11 +175,17 @@ public class Repository {
     }
   
     public void saveBookmark(Bookmark bookmark) {
-        bookmarkList.put(bookmark.getUserId(), bookmark);
+        bookmarkList.put(bookmark.getBookmarkId(), bookmark);
     }
 
-    public Bookmark findBookmarkByUserId(String userId){
-        return bookmarkList.get(userId);
+    public List<Bookmark> findBookmarksByUserId(String userId){
+        return bookmarkList.values().stream()
+                .filter(bookmark -> bookmark.getUserId().equals(userId))
+                .toList();
+    }
+
+    public Bookmark findBookmarkByBookmarkId(String bookmarkId){
+        return bookmarkList.get(bookmarkId);
     }
 
     @PostConstruct
