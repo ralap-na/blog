@@ -6,6 +6,7 @@ import blog.feedback.Comment;
 import blog.feedback.Reaction;
 import blog.feedback.service.FeedbackService;
 import blog.notification.service.NotificationService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,11 @@ public class FeedbackController {
     @Autowired
     NotificationService notificationService;
 
+    // Comment
     @PostMapping("/{writerId}/{articleId}/{readerId}/comment-edited")
     public ResponseEntity<String> createComment(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId,@RequestBody String content){
         OperationOutcome feedbackOutcome = feedbackService.createComment(articleId, readerId, content, Instant.now());
-        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a comment!", "Someone left a comment under your article!", Instant.now());
+        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "Someone left a comment under your article!", "Someone left a comment under your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
@@ -35,15 +37,24 @@ public class FeedbackController {
         }
     }
 
-    @PutMapping("/{userId}/{articleId}/{commentId}/comment-edited")
-    public ResponseEntity<String> updateComment(@PathVariable String userId, @PathVariable String articleId, @PathVariable String commentId, @RequestBody String content){
-        OperationOutcome outcome = feedbackService.updateComment(commentId, userId, content, Instant.now());
+    @DeleteMapping("/{articleId}/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable String articleId, @PathVariable String commentId, HttpSession session){
+        String userId = session.getAttribute("userId").toString();
+
+        if(userId == null){
+            return ResponseEntity.badRequest().body("You are not logged in.");
+        }
+
+        OperationOutcome outcome = feedbackService.deleteComment(commentId, userId);
 
         if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
-        else{
-            return ResponseEntity.internalServerError().build();
+        else if(outcome.getMessage().equals("Invalid user.")){
+            return ResponseEntity.badRequest().body(outcome.getMessage());
+        }
+        else {
+            return ResponseEntity.internalServerError().body(outcome.getMessage());
         }
     }
 
@@ -83,6 +94,7 @@ public class FeedbackController {
         }
     }
 
+    // Reaction
     @GetMapping("/{articleId}/reactions")
     public ResponseEntity<List<Reaction>> getReactionsByArticleId(@PathVariable("articleId") String articleId) {
         List<Reaction> reactions = feedbackService.getReactionsByArticleId(articleId);
@@ -134,7 +146,7 @@ public class FeedbackController {
     @PostMapping("/{writerId}/{articleId}/{readerId}/add-reaction")
     public ResponseEntity<String> addReactionOnArticle(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String readerId, @RequestBody String type){
         OperationOutcome feedbackOutcome = feedbackService.addReactionOnArticle(articleId, readerId, type);
-        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a reaction!", "Someone " + type + " your article!", Instant.now());
+        OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "Someone " + type + " your article!", "Someone " + type + " your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
@@ -157,15 +169,24 @@ public class FeedbackController {
         }
     }
 
-    @DeleteMapping("/{userId}/{articleId}/{reactionId}/delete-reaction")
-    public ResponseEntity<String> deleteReaction(@PathVariable String userId, @PathVariable String articleId, @PathVariable String reactionId){
+    @DeleteMapping("/{articleId}/{reactionId}")
+    public ResponseEntity<String> deleteReaction(@PathVariable String articleId, @PathVariable String reactionId, HttpSession session){
+        String userId = session.getAttribute("userId").toString();
+
+        if(userId == null){
+            return ResponseEntity.badRequest().body("You are not logged in.");
+        }
+
         OperationOutcome outcome = feedbackService.removeReaction(reactionId, userId);
 
         if(outcome.getState().equals(OutcomeState.SUCCESS)){
             return ResponseEntity.ok().build();
         }
-        else{
-            return ResponseEntity.internalServerError().build();
+        else if(outcome.getMessage().equals("Invalid user.")){
+            return ResponseEntity.badRequest().body(outcome.getMessage());
+        }
+        else {
+            return ResponseEntity.internalServerError().body(outcome.getMessage());
         }
     }
 }
