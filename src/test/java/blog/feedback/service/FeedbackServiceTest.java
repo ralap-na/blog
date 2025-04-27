@@ -51,7 +51,7 @@ public class FeedbackServiceTest {
         OperationOutcome outcome = feedbackService.createComment(articleId, userId, "", Instant.now());
         assertEquals(OutcomeState.FAILURE, outcome.getState());
     }
-
+  
     @Test
     public void delete_a_comment() {
         OperationOutcome createOutcome = feedbackService.createComment(articleId, userId, content, Instant.now());

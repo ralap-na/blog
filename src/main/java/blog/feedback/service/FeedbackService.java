@@ -50,7 +50,6 @@ public class FeedbackService {
                 return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
             }
         }
-
         repository.deleteComment(commentId);
         return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
     }
