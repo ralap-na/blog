@@ -1,5 +1,6 @@
 package blog.feedback.service;
 
+import blog.article.Article;
 import blog.article.Repository;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
@@ -39,7 +40,12 @@ public class FeedbackService {
             return OperationOutcome.create().setId(commentId).setMessage("Comment not found.").setState(OutcomeState.FAILURE);
         }
 
-        if (!comment.getUserId().equals(userId)) {
+        Article article = repository.findArticleById(comment.getArticleId());
+
+        if (!article.getUserId().equals(userId)) {
+            return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+        }
+        else if (!comment.getUserId().equals(userId)) {
             return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
         }
 
