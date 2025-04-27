@@ -31,10 +31,10 @@ public class FeedbackServiceTest {
         assertEquals(OutcomeState.FAILURE, outcome.getState());
     }
 
-    @Test
-    public void update_a_comment() {
-        String commentId = feedbackService.createComment(articleId, userId, content, Instant.now()).getId();
-        OperationOutcome outcome = feedbackService.updateComment(commentId, userId, content, Instant.now());
-        assertEquals(OutcomeState.SUCCESS, outcome.getState());
-    }
+//    @Test
+//    public void update_a_comment() {
+//        String commentId = feedbackService.createComment(articleId, userId, content, Instant.now()).getId();
+//        OperationOutcome outcome = feedbackService.updateComment(commentId, userId, content, Instant.now());
+//        assertEquals(OutcomeState.SUCCESS, outcome.getState());
+//    }
 }

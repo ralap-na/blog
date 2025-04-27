@@ -49,7 +49,6 @@ public class ArticleServiceTest {
     public void getAllArticles(){
         repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
 
-
         Collection<Article> articles = articleService.getAllArticles();
 
         assertEquals(2, articles.size());
