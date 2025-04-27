@@ -41,12 +41,14 @@ public class FeedbackService {
         }
 
         Article article = repository.findArticleById(comment.getArticleId());
-
-        if (!article.getUserId().equals(userId)) {
-            return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+        if (article == null) {
+            return OperationOutcome.create().setId(commentId).setMessage("Article might be deleted.").setState(OutcomeState.FAILURE);
         }
-        else if (!comment.getUserId().equals(userId)) {
-            return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+
+        if(!comment.getUserId().equals(userId)) {
+            if(!article.getUserId().equals(userId)) {
+                return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+            }
         }
 
         repository.deleteComment(commentId);

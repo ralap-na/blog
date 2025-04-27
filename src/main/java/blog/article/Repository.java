@@ -15,8 +15,8 @@ public class Repository {
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
-    private final Map<String, Comment> CommentList = new HashMap<>();
-    private final Map<String, Reaction> ReactionList = new HashMap<>();
+    private final Map<String, Comment> commentList = new HashMap<>();
+    private final Map<String, Reaction> reactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
     private final Map<String, Category> categoryList = new HashMap<>();
@@ -24,6 +24,8 @@ public class Repository {
     public void clear(){
         articleList.clear();
         deletedArticleList.clear();
+        commentList.clear();
+        reactionList.clear();
     }
 
     public Collection<Article> findAllArticles(){
@@ -91,55 +93,55 @@ public class Repository {
     // Comment
 
     public Comment findCommentById(String commentId){
-        return CommentList.get(commentId);
+        return commentList.get(commentId);
     }
 
     public List<Comment> findCommentsByArticleId(String articleId){
-        return CommentList.values().stream()
+        return commentList.values().stream()
                 .filter(comment -> comment.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Comment> findAllComments(){
-        return CommentList.values().stream().toList();
+        return commentList.values().stream().toList();
     }
 
     public void saveComment(Comment comment) {
-        CommentList.put(comment.getId(), comment);
+        commentList.put(comment.getId(), comment);
     }
 
     public void deleteComment(String commentId) {
-        CommentList.remove(commentId);
+        commentList.remove(commentId);
     }
 
     // Reaction
 
     public List<Reaction> findReactionsByArticleId(String articleId){
-        return ReactionList.values().stream()
+        return reactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Reaction> findReactionsByCommentId(String articleId, String commentId){
-        return ReactionList.values().stream()
+        return reactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId) && reaction.getCommentId().equals(commentId))
                 .toList();
     }
 
     public Reaction findReactionById(String reactionId){
-        return ReactionList.get(reactionId);
+        return reactionList.get(reactionId);
     }
 
     public List<Reaction> findAllReactions(){
-        return ReactionList.values().stream().toList();
+        return reactionList.values().stream().toList();
     }
 
     public void saveReaction(Reaction reaction) {
-        ReactionList.put(reaction.getId(), reaction);
+        reactionList.put(reaction.getId(), reaction);
     }
 
     public void deleteReaction(String reactionId) {
-        ReactionList.remove(reactionId);
+        reactionList.remove(reactionId);
     }
 
     // User
