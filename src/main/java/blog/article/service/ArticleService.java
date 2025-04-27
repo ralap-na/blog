@@ -31,8 +31,51 @@ public class ArticleService {
 
     }
 
-    public Collection<Article> getAllArticles() {
-        Collection<Article> articles = repository.findAllArticles();
+    public Collection<Article> getArticlesByUserId(String userId){
+
+        return repository.findArticlesByUserId(userId);
+    }
+
+    public Article getArticle(String articleId) {
+        Article article = repository.findArticleById(articleId);
+        if(article == null){
+            return null;
+        }
+
+        return article;
+    }
+
+    public Boolean update(String articleId, String title, String content, String tag, String category){
+        Article article = repository.findArticleById(articleId);
+
+        if (article == null) {
+            return false; // 文章不存在，返回 false
+        }
+        article.update(title, content, tag, category);
+        repository.saveArticle(article);
+        return true;
+    }
+
+    public boolean delete(String userId, String articleId){
+        Article article = repository.findArticleById(articleId);
+
+        if (article == null) {
+            return false; // 文章不存在，返回 false
+        }
+
+        if(userId.equals(article.getUserId())){
+            repository.delete(articleId);
+        }
+
+        if(repository.findArticleById(articleId) == null && repository.findDeletedArticleById(articleId) != null){
+            return true;
+        }
+
+        return false;
+    }
+
+    public Collection<Article> getAllDeletedArticlesByUserId(String userId) {
+        Collection<Article> articles = repository.findAllDeletedArticlesByUserId(userId);
         if(articles == null){
             return null;
         }
@@ -40,8 +83,26 @@ public class ArticleService {
         return articles;
     }
 
-    public Collection<Article> getAllDeletedArticlesByUserId(String userId) {
-        Collection<Article> articles = repository.findAllDeletedArticlesByUserId(userId);
+    public boolean recover(String userId, String articleId){
+        Article article = repository.findDeletedArticleById(articleId);
+
+        if (article == null) {
+            return false; // 文章不存在，返回 false
+        }
+
+        if(userId.equals(article.getUserId())){
+            repository.recover(articleId);
+        }
+
+        if(repository.findArticleById(articleId) != null && repository.findDeletedArticleById(articleId) == null){
+            return true;
+        }
+
+        return false;
+    }
+
+    public Collection<Article> getAllArticles() {
+        Collection<Article> articles = repository.findAllArticles();
         if(articles == null){
             return null;
         }
@@ -109,66 +170,5 @@ public class ArticleService {
         }
 
         return articles;
-    }
-
-    public Article getArticle(String articleId) {
-        Article article = repository.findArticleById(articleId);
-        if(article == null){
-            return null;
-        }
-
-        return article;
-    }
-
-    public Collection<Article> getArticlesByUserId(String userId){
-
-        return repository.findArticlesByUserId(userId);
-    }
-
-    public Boolean update(String articleId, String title, String content, String tag, String category){
-        Article article = repository.findArticleById(articleId);
-
-        if (article == null) {
-            return false; // 文章不存在，返回 false
-        }
-        article.update(title, content, tag, category);
-        repository.saveArticle(article);
-        return true;
-    }
-
-    public boolean delete(String userId, String articleId){
-        Article article = repository.findArticleById(articleId);
-
-        if (article == null) {
-            return false; // 文章不存在，返回 false
-        }
-
-        if(userId.equals(article.getUserId())){
-            repository.delete(articleId);
-        }
-
-        if(repository.findArticleById(articleId) == null && repository.findDeletedArticleById(articleId) != null){
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean recover(String userId, String articleId){
-        Article article = repository.findDeletedArticleById(articleId);
-
-        if (article == null) {
-            return false; // 文章不存在，返回 false
-        }
-
-        if(userId.equals(article.getUserId())){
-            repository.recover(articleId);
-        }
-
-        if(repository.findArticleById(articleId) != null && repository.findDeletedArticleById(articleId) == null){
-            return true;
-        }
-
-        return false;
     }
 }
