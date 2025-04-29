@@ -502,7 +502,7 @@ class ArticleControllerTest {
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/bookmark/" + userId,
+                baseUrl + "/bookmark/user/" + userId,
                 HttpMethod.GET,
                 request,
                 String.class

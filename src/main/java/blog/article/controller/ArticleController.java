@@ -248,7 +248,7 @@ public class ArticleController {
         }
     }
 
-    @GetMapping("/bookmark/{userId}")
+    @GetMapping("/bookmark/user/{userId}")
     public ResponseEntity<List<Bookmark>> getBookmarksByUserId(@PathVariable String userId){
         List<Bookmark> bookmarks = bookmarkService.getBookmarks(userId);
 
