@@ -1,6 +1,8 @@
-package blog.article;
+package blog.chat;
 
+import blog.article.*;
 import blog.chat.Chat;
+import blog.chat.Conversation;
 import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
@@ -12,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class Repository {
+public class FakeRepository extends Repository {
 
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
@@ -70,7 +72,7 @@ public class Repository {
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }
-  
+
     public Article findDeletedArticleById(String articleId){
         return deletedArticleList.get(articleId);
     }
@@ -146,7 +148,7 @@ public class Repository {
     }
 
     // User
-      
+
     public Optional<User> findUserByUsername(String username) {
         return userList.values().stream().filter(user -> user.getUsername().equals(username)).findAny();
     }
@@ -158,7 +160,7 @@ public class Repository {
     public User findUserById(String userId) {
         return userList.get(userId);
     }
-     
+
     public Notification findNotificationById(String id) {
         return notificationList.get(id);
     }
@@ -176,7 +178,7 @@ public class Repository {
     public void deleteNotificationById(String notificationId) {
         notificationList.remove(notificationId);
     }
-  
+
     public void saveBookmark(Bookmark bookmark) {
         bookmarkList.put(bookmark.getUserId(), bookmark);
     }
