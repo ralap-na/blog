@@ -1,6 +1,8 @@
-package blog.article;
+package blog.chat;
 
+import blog.article.*;
 import blog.chat.Chat;
+import blog.chat.Conversation;
 import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
@@ -12,13 +14,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class Repository {
+public class FakeRepository extends Repository {
 
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
-    private final Map<String, Comment> commentList = new HashMap<>();
-    private final Map<String, Reaction> reactionList = new HashMap<>();
+    private final Map<String, Comment> CommentList = new HashMap<>();
+    private final Map<String, Reaction> ReactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
     private final Map<String, Category> categoryList = new HashMap<>();
@@ -27,8 +29,6 @@ public class Repository {
     public void clear(){
         articleList.clear();
         deletedArticleList.clear();
-        commentList.clear();
-        reactionList.clear();
     }
 
     public Collection<Article> findAllArticles(){
@@ -72,7 +72,7 @@ public class Repository {
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }
-  
+
     public Article findDeletedArticleById(String articleId){
         return deletedArticleList.get(articleId);
     }
@@ -96,58 +96,59 @@ public class Repository {
     // Comment
 
     public Comment findCommentById(String commentId){
-        return commentList.get(commentId);
+        return CommentList.get(commentId);
     }
 
     public List<Comment> findCommentsByArticleId(String articleId){
-        return commentList.values().stream()
+        return CommentList.values().stream()
                 .filter(comment -> comment.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Comment> findAllComments(){
-        return commentList.values().stream().toList();
+        return CommentList.values().stream().toList();
     }
 
     public void saveComment(Comment comment) {
-        commentList.put(comment.getId(), comment);
+        CommentList.put(comment.getId(), comment);
     }
 
     public void deleteComment(String commentId) {
-        commentList.remove(commentId);
+        CommentList.remove(commentId);
     }
+
     // Reaction
 
     public List<Reaction> findReactionsByArticleId(String articleId){
-        return reactionList.values().stream()
+        return ReactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Reaction> findReactionsByCommentId(String articleId, String commentId){
-        return reactionList.values().stream()
+        return ReactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId) && reaction.getCommentId().equals(commentId))
                 .toList();
     }
 
     public Reaction findReactionById(String reactionId){
-        return reactionList.get(reactionId);
+        return ReactionList.get(reactionId);
     }
 
     public List<Reaction> findAllReactions(){
-        return reactionList.values().stream().toList();
+        return ReactionList.values().stream().toList();
     }
 
     public void saveReaction(Reaction reaction) {
-        reactionList.put(reaction.getId(), reaction);
+        ReactionList.put(reaction.getId(), reaction);
     }
 
     public void deleteReaction(String reactionId) {
-        reactionList.remove(reactionId);
+        ReactionList.remove(reactionId);
     }
 
     // User
-      
+
     public Optional<User> findUserByUsername(String username) {
         return userList.values().stream().filter(user -> user.getUsername().equals(username)).findAny();
     }
@@ -159,7 +160,7 @@ public class Repository {
     public User findUserById(String userId) {
         return userList.get(userId);
     }
-     
+
     public Notification findNotificationById(String id) {
         return notificationList.get(id);
     }
@@ -177,7 +178,7 @@ public class Repository {
     public void deleteNotificationById(String notificationId) {
         notificationList.remove(notificationId);
     }
-  
+
     public void saveBookmark(Bookmark bookmark) {
         bookmarkList.put(bookmark.getUserId(), bookmark);
     }
