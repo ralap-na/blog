@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -185,13 +186,34 @@ public class RepositoryTest {
     @Test
     public void saveBookmark() {
         String userId = "u1";
-        Bookmark bookmark = new Bookmark(userId);
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
 
         repository.saveBookmark(bookmark);
 
-        Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
+        Bookmark bookmark1 = repository.findBookmarkByBookmarkId(bookmarkId);
 
         assertEquals(userId, bookmark1.getUserId());
+    }
+
+    @Test
+    public void findBookmarksByUserId() {
+        String userId = "u1";
+        String bookmarkId_1 = "b1";
+        String bookmarkName_1 = "Bookmark-1";
+        String bookmarkId_2 = "b2";
+        String bookmarkName_2 = "Bookmark-2";
+        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1, userId);
+        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2, userId);
+        repository.saveBookmark(bookmark_1);
+        repository.saveBookmark(bookmark_2);
+
+        List<Bookmark> bookmarkList = repository.findBookmarksByUserId(userId);
+
+        assertTrue(bookmarkList.contains(bookmark_1));
+        assertTrue(bookmarkList.contains(bookmark_2));
+        assertEquals(2, bookmarkList.size());
     }
 
     @Test
