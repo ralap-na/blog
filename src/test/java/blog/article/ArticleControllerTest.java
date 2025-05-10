@@ -615,16 +615,11 @@ class ArticleControllerTest {
     private PasswordEncoder passwordEncoder;
 
     private String loginAsAdminAndGetCookie() {
-        // 先在 Repository 放一個 Admin user
-
-        String password = passwordEncoder.encode("admin-password");
-        User adminUser = new User("admin-id", "Admin", password);
-        repository.saveUser(adminUser);
 
         // 用 JSON 格式登入
         JSONObject requestBody = new JSONObject();
         requestBody.put("username", "Admin");
-        requestBody.put("password", "admin-password");
+        requestBody.put("password", "Admin");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

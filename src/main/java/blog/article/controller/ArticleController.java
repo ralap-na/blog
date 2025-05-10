@@ -37,7 +37,7 @@ public class ArticleController {
     UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity<String> create(@RequestBody String info){
+    public ResponseEntity<String> createArticle(@RequestBody String info){
         JSONObject jsonObject = new JSONObject(info);
         String articleId = UUID.randomUUID().toString();
         String userId = jsonObject.getString("userId");
@@ -55,6 +55,85 @@ public class ArticleController {
 
         if(articleId != null){
             return ResponseEntity.ok().body(articleId);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Collection<Article>> getArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getArticlesByUserId(userId);
+
+        return ResponseEntity.ok().body(articles);
+    }
+
+    @GetMapping("/{articleId}")
+    public ResponseEntity<Article> getArticle(@PathVariable String articleId){
+        Article article = articleService.getArticle(articleId);
+
+        if(article != null){
+            return ResponseEntity.ok().body(article);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{articleId}")
+    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId){
+
+        JSONObject jsonObject = new JSONObject(info);
+
+        String title = jsonObject.getString("title");
+        String content = jsonObject.getString("content");
+        String tag = jsonObject.getString("tag");
+        String category = jsonObject.getString("category");
+
+        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
+            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+        }
+
+        Boolean message = articleService.update(articleId, title, content, tag, category);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> deleteArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = articleService.delete(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/all/deleted/{userId}")
+    public ResponseEntity<Collection<Article>> getAllDeletedArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> recoverArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = articleService.recover(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
         }
         else{
             return ResponseEntity.internalServerError().build();
@@ -102,18 +181,6 @@ public class ArticleController {
         return ResponseEntity.ok(articles);
     }
 
-    @GetMapping("/all/deleted/{userId}")
-    public ResponseEntity<Collection<Article>> getAllDeletedArticlesByUserId(@PathVariable String userId){
-        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
-
-        if(articles != null){
-            return ResponseEntity.ok().body(articles);
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @GetMapping("/tag/{tag}")
     public ResponseEntity<Collection<Article>> getArticlesByTag(@PathVariable String tag){
         Collection<Article> articles = articleService.getArticlesByTag(tag);
@@ -136,25 +203,6 @@ public class ArticleController {
         else{
             return ResponseEntity.internalServerError().build();
         }
-    }
-
-    @GetMapping("/{articleId}")
-    public ResponseEntity<Article> getArticle(@PathVariable String articleId){
-        Article article = articleService.getArticle(articleId);
-
-        if(article != null){
-            return ResponseEntity.ok().body(article);
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<Collection<Article>> getArticlesByUserId(@PathVariable String userId){
-        Collection<Article> articles = articleService.getArticlesByUserId(userId);
-
-        return ResponseEntity.ok().body(articles);
     }
 
     @GetMapping("/title/{keyword}")
