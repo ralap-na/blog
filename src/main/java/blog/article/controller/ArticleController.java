@@ -62,33 +62,38 @@ public class ArticleController {
 
     @PostMapping("/v2")
     public ResponseEntity<String> createArticleV2(@RequestBody String info, HttpSession session){
-        JSONObject jsonObject = new JSONObject(info);
-        String articleId = UUID.randomUUID().toString();
-        String title = jsonObject.getString("title");
-        String content = jsonObject.getString("content");
-        String tag = jsonObject.getString("tag");
-        String category = jsonObject.getString("category");
-        Instant date = Instant.parse(jsonObject.getString("date"));
-
         String userId = (String) session.getAttribute("userId");
-
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
         }
 
-        User user = userService.getUser(userId);
+        JSONObject jsonObject = new JSONObject(info);
+        String title = jsonObject.getString("title");
+        String content = jsonObject.getString("content");
+        String tag = jsonObject.getString("tag");
+        String category = jsonObject.getString("category");
+        String dateStr = jsonObject.getString("date");
 
         if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
             return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
         }
 
-        articleId = articleService.createV2(user, articleId, title, content, tag, category, date);
+        Instant date;
+        try {
+            date = Instant.parse(dateStr);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid date format.");
+        }
 
-        if(articleId != null){
-            return ResponseEntity.ok().body(articleId);
+        String articleId = UUID.randomUUID().toString();
+        User user = userService.getUser(userId);
+        String resultId = articleService.createV2(user, articleId, title, content, tag, category, date);
+
+        if(resultId != null){
+            return ResponseEntity.ok().body(resultId);
         }
         else{
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Failed to create article.");
         }
     }
 
