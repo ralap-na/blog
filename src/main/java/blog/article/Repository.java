@@ -158,7 +158,7 @@ public class Repository {
     public User findUserById(String userId) {
         return userList.get(userId);
     }
-     
+
     public Notification findNotificationById(String id) {
         return notificationList.get(id);
     }
@@ -223,11 +223,13 @@ public class Repository {
                 .filter(chat -> chat.getUser1Id().equals(userId) || chat.getUser2Id().equals(userId))
                 .collect(Collectors.toMap(
                         chat -> {
-                            return chat.getUser1Id().equals(userId) ? chat.getUser2Id() : chat.getUser1Id();
+                            String otherUserId = chat.getUser1Id().equals(userId) ? chat.getUser2Id() : chat.getUser1Id();
+                            return findUserById(otherUserId).getUsername(); // 这里 key 是用户名
                         },
                         chat -> chat
                 ));
     }
+
 
     public boolean findChatsByUsers(String user1Id, String user2Id) {
         for (Chat chat : chatList.values()) {
