@@ -16,7 +16,6 @@ public class User {
         this.userId = userId;
         this.username = username;
         this.password = password;
-        this.articleList = new ArrayList<>();
     }
 
     public void clear(){
@@ -24,6 +23,9 @@ public class User {
     }
 
     public List<Article> getArticleList() {
+        if (articleList == null) {
+            articleList = new ArrayList<>();
+        }
         return articleList;
     }
 
@@ -32,11 +34,14 @@ public class User {
     }
 
     public String addArticle(Article article){
-        articleList.add(article);
+        if (article == null) return null;
+        getArticleList().add(article);
         return article.getArticleId();
     }
 
     public Article findArticleById(String articleId){
+        if (articleId == null || articleList == null) return null;
+
         for(Article article: articleList){
             if(article.getArticleId().equals(articleId)){
                 return article;
