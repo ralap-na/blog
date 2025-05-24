@@ -33,7 +33,7 @@ public class ArticleService {
     }
 
     public String createV2(User user, String articleId, String title, String content, String tag, String category, Instant date) {
-        Article article = new Article(articleId, title, content, tag, category, date, false);
+        Article article = new Article(user.getUserId(), articleId, title, content, tag, category, date, false);
 
         repository.saveArticle(article);
         articleId = user.addArticle(article);
