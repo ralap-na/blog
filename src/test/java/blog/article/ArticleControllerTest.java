@@ -114,11 +114,12 @@ class ArticleControllerTest {
         User user = repository.findUserByUsername("Admin").get();
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = user.findArticleById(response.getBody());
-        assertEquals("Created Title", updatedArticle.getTitle());
-        assertEquals("Created Content", updatedArticle.getContent());
-        assertEquals("Created tag", updatedArticle.getTag());
-        assertEquals("Created category", updatedArticle.getCategory());
+        Article createdArticle = user.findArticleById(response.getBody());
+        assertEquals(user.getUserId(), createdArticle.getUserId());
+        assertEquals("Created Title", createdArticle.getTitle());
+        assertEquals("Created Content", createdArticle.getContent());
+        assertEquals("Created tag", createdArticle.getTag());
+        assertEquals("Created category", createdArticle.getCategory());
 
         // Teardown
         user.clear();
