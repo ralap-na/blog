@@ -1,8 +1,6 @@
 package blog.chat;
 
 import blog.article.*;
-import blog.chat.Chat;
-import blog.chat.Conversation;
 import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;

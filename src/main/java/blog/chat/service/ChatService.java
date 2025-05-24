@@ -2,7 +2,7 @@ package blog.chat.service;
 
 import blog.article.Repository;
 import blog.chat.Chat;
-import blog.chat.Conversation;
+import blog.chat.Message;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,14 +76,14 @@ public class ChatService {
                     .setMessage("Date is after now!");
         }
 
-        String conversationId = UUID.randomUUID().toString();
-        Conversation conversation = new Conversation(conversationId , userId, content, date);
-        repository.findChat(chatId).addConversation(conversation);
+        String messageId = UUID.randomUUID().toString();
+        Message message = new Message(messageId , userId, content, date);
+        repository.findChat(chatId).addMessage(message);
 
         return OperationOutcome.create()
-                .setId(conversationId)
+                .setId(messageId)
                 .setState(OutcomeState.SUCCESS)
-                .setMessage("send conversation success!");
+                .setMessage("send message success!");
     }
 
     public Map<String, Chat> getAllChats(String userId) {

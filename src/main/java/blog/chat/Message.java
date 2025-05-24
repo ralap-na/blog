@@ -2,13 +2,13 @@ package blog.chat;
 
 import java.time.Instant;
 
-public class Conversation {
+public class Message {
     private String id;
     private String userId;
     private String content;
     private Instant date;
 
-    public Conversation(String id, String userId, String content, Instant date) {
+    public Message(String id, String userId, String content, Instant date) {
         this.id = id;
         this.userId = userId;
         this.content = content;

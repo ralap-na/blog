@@ -7,13 +7,13 @@ public class Chat {
     private String id;
     private String user1Id;
     private String user2Id;
-    private List<Conversation> conversations;
+    private List<Message> messages;
 
     public Chat(String id, String user1Id, String user2Id) {
         this.id = id;
         this.user1Id = user1Id;
         this.user2Id = user2Id;
-        this.conversations = new ArrayList<>();
+        this.messages = new ArrayList<>();
     }
 
     public String getId() {
@@ -40,15 +40,15 @@ public class Chat {
         this.user1Id = user1Id;
     }
 
-    public List<Conversation> getConversations() {
-        return conversations;
+    public List<Message> getMessages() {
+        return messages;
     }
 
-    public void setConversations(List<Conversation> conversations) {
-        this.conversations = conversations;
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
-    public void addConversation(Conversation conversation) {
-        this.conversations.add(conversation);
+    public void addMessage(Message message) {
+        this.messages.add(message);
     }
 }

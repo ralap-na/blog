@@ -1,7 +1,7 @@
 package blog.chat.controller;
 
 import blog.chat.Chat;
-import blog.chat.Conversation;
+import blog.chat.Message;
 import blog.chat.service.ChatService;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
@@ -58,8 +58,8 @@ public class ChatController {
 
         OperationOutcome outcome = chatService.send(chatId, userId, content, now);
         if (outcome.getState().equals(OutcomeState.SUCCESS)) {
-            Conversation conversation = new Conversation(outcome.getId(), userId, content, now);
-            messagingTemplate.convertAndSend("/topic/chat/" + chatId, conversation);
+            Message message = new Message(outcome.getId(), userId, content, now);
+            messagingTemplate.convertAndSend("/topic/chat/" + chatId, message);
             return ResponseEntity.ok(outcome.getId());
         } else {
             return ResponseEntity.internalServerError().build();
