@@ -1,14 +1,49 @@
 package blog.user;
 
+import blog.article.Article;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String userId;
     private String username;
     private String password;
 
+    private List<Article> articleList;
+
     public User(String userId, String username, String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;
+        this.articleList = new ArrayList<>();
+    }
+
+    public void clear(){
+        articleList.clear();
+    }
+
+    public List<Article> getArticleList() {
+        return articleList;
+    }
+
+    public void setArticleList(List<Article> articleList) {
+        this.articleList = articleList;
+    }
+
+    public String addArticle(Article article){
+        articleList.add(article);
+        return article.getArticleId();
+    }
+
+    public Article findArticleById(String articleId){
+        for(Article article: articleList){
+            if(article.getArticleId().equals(articleId)){
+                return article;
+            }
+        }
+
+        return null;
     }
 
     public String getUserId() {

@@ -1,6 +1,7 @@
 package blog.article;
 
 import blog.article.service.ArticleService;
+import blog.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,17 @@ public class ArticleServiceTest {
         String articleId = articleService.create("1", "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
+    }
+
+    @Test
+    public void saveArticle2(){
+        User user = repository.findUserByUsername("Admin").get();
+
+        String articleId = articleService.createV2(user, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
+
+        assertEquals("2", articleId);
+
+        user.clear();
     }
 
     @Test

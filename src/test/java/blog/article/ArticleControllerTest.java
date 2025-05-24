@@ -79,6 +79,52 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void createArticleSuccessV2() {
+        // 準備測試文章
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("title", "Created Title");
+        requestBody.put("content", "Created Content");
+        requestBody.put("tag", "Created tag");
+        requestBody.put("category", "Created category");
+        requestBody.put("date", "2025-04-12T15:30:24.517Z");
+
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
+        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
+
+        // 發送 POST request
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/v2",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        // 檢查reponse status code 是否是 200 OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        String articleId = response.getBody();
+        assertNotNull(articleId);
+        assertDoesNotThrow(() -> UUID.fromString(articleId)); // 確保是合法 UUID
+
+        User user = repository.findUserByUsername("Admin").get();
+
+        // 驗證 Repository 中的資料是否更新
+        Article updatedArticle = user.findArticleById(response.getBody());
+        assertEquals("Created Title", updatedArticle.getTitle());
+        assertEquals("Created Content", updatedArticle.getContent());
+        assertEquals("Created tag", updatedArticle.getTag());
+        assertEquals("Created category", updatedArticle.getCategory());
+
+        // Teardown
+        user.clear();
+    }
+
+    @Test
     public void createArticleFail() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();

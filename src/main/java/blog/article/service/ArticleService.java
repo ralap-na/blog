@@ -2,6 +2,7 @@ package blog.article.service;
 
 import blog.article.Article;
 import blog.article.Repository;
+import blog.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,22 @@ public class ArticleService {
         repository.saveArticle(article);
 
         article = repository.findArticleById(articleId);
+
+        if(article == null){
+            return null;
+        }
+
+        return  articleId;
+
+    }
+
+    public String createV2(User user, String articleId, String title, String content, String tag, String category, Instant date) {
+        Article article = new Article(articleId, title, content, tag, category, date, false);
+
+        repository.saveArticle(article);
+        articleId = user.addArticle(article);
+
+        article = user.findArticleById(articleId);
 
         if(article == null){
             return null;
