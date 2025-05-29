@@ -45,43 +45,6 @@ class ArticleControllerTest {
     public void createArticleSuccess() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
-        requestBody.put("userId", "1");
-        requestBody.put("articleId", "3");
-        requestBody.put("title", "Created Title");
-        requestBody.put("content", "Created Content");
-        requestBody.put("tag", "Created tag");
-        requestBody.put("category", "Created category");
-        requestBody.put("date", "2025-04-12T15:30:24.517Z");
-
-        // 設定Header
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
-
-        // 發送 POST request
-        ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/",
-                HttpMethod.POST,
-                request,
-                String.class
-        );
-
-        // 檢查reponse status code 是否是 200 OK
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById(response.getBody());
-        assertEquals("1", updatedArticle.getUserId());
-        assertEquals("Created Title", updatedArticle.getTitle());
-        assertEquals("Created Content", updatedArticle.getContent());
-        assertEquals("Created tag", updatedArticle.getTag());
-        assertEquals("Created category", updatedArticle.getCategory());
-    }
-
-    @Test
-    public void createArticleSuccessV2() {
-        // 準備測試文章
-        JSONObject requestBody = new JSONObject();
         requestBody.put("title", "Created Title");
         requestBody.put("content", "Created Content");
         requestBody.put("tag", "Created tag");
@@ -99,7 +62,7 @@ class ArticleControllerTest {
 
         // 發送 POST request
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/v2",
+                baseUrl + "/",
                 HttpMethod.POST,
                 request,
                 String.class
@@ -137,9 +100,13 @@ class ArticleControllerTest {
         requestBody.put("category", "Created category");
         requestBody.put("date", "2025-04-12T15:30:24.517Z");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 POST request
@@ -151,8 +118,8 @@ class ArticleControllerTest {
         );
 
         // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot be Empty.", response.getBody());
     }
 
     @Test

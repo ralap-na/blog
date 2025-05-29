@@ -40,17 +40,9 @@ public class ArticleServiceTest {
 
     @Test
     public void saveArticle(){
-
-        String articleId = articleService.create("1", "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
-
-        assertEquals("2", articleId);
-    }
-
-    @Test
-    public void saveArticle2(){
         String userId = repository.findUserByUsername("Admin").get().getUserId();
 
-        String articleId = articleService.createV2(userId, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
+        String articleId = articleService.create(userId, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
 

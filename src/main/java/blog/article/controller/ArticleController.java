@@ -37,32 +37,7 @@ public class ArticleController {
     UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity<String> createArticle(@RequestBody String info){
-        JSONObject jsonObject = new JSONObject(info);
-        String articleId = UUID.randomUUID().toString();
-        String userId = jsonObject.getString("userId");
-        String title = jsonObject.getString("title");
-        String content = jsonObject.getString("content");
-        String tag = jsonObject.getString("tag");
-        String category = jsonObject.getString("category");
-        Instant date = Instant.parse(jsonObject.getString("date"));
-
-        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
-        }
-
-        articleId = articleService.create(userId, articleId, title, content, tag, category, date);
-
-        if(articleId != null){
-            return ResponseEntity.ok().body(articleId);
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/v2")
-    public ResponseEntity<String> createArticleV2(@RequestBody String info, HttpSession session){
+    public ResponseEntity<String> createArticle(@RequestBody String info, HttpSession session){
         String userId = (String) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
@@ -88,7 +63,7 @@ public class ArticleController {
 
         String articleId = UUID.randomUUID().toString();
 
-        String resultId = articleService.createV2(userId, articleId, title, content, tag, category, date);
+        String resultId = articleService.create(userId, articleId, title, content, tag, category, date);
 
         if(resultId != null){
             return ResponseEntity.ok().body(resultId);

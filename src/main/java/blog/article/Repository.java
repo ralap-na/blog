@@ -156,6 +156,10 @@ public class Repository {
     public User findUserById(String userId) {
         return userList.get(userId);
     }
+
+    public void deleteUser(String userId) {
+        userList.remove(userId);
+    }
      
     public Notification findNotificationById(String id) {
         return notificationList.get(id);

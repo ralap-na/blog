@@ -23,21 +23,6 @@ public class ArticleService {
 
     public String create(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
         Article article = new Article(userId, articleId, title, content, tag, category, date, false);
-
-        repository.saveArticle(article);
-
-        article = repository.findArticleById(articleId);
-
-        if(article == null){
-            return null;
-        }
-
-        return  articleId;
-
-    }
-
-    public String createV2(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
-        Article article = new Article(userId, articleId, title, content, tag, category, date, false);
         User user = userService.getUser(userId);
 
         repository.saveArticle(article);
