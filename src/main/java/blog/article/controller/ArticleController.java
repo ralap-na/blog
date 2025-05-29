@@ -1,6 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.Repository;
 import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import blog.article.service.CategoryService;
@@ -86,8 +87,8 @@ public class ArticleController {
         }
 
         String articleId = UUID.randomUUID().toString();
-        User user = userService.getUser(userId);
-        String resultId = articleService.createV2(user, articleId, title, content, tag, category, date);
+
+        String resultId = articleService.createV2(userId, articleId, title, content, tag, category, date);
 
         if(resultId != null){
             return ResponseEntity.ok().body(resultId);

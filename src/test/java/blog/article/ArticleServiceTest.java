@@ -48,11 +48,13 @@ public class ArticleServiceTest {
 
     @Test
     public void saveArticle2(){
-        User user = repository.findUserByUsername("Admin").get();
+        String userId = repository.findUserByUsername("Admin").get().getUserId();
 
-        String articleId = articleService.createV2(user, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
+        String articleId = articleService.createV2(userId, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
+
+        User user = repository.findUserByUsername("Admin").get();
 
         user.clear();
     }

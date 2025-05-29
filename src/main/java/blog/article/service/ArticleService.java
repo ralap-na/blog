@@ -3,6 +3,7 @@ package blog.article.service;
 import blog.article.Article;
 import blog.article.Repository;
 import blog.user.User;
+import blog.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ public class ArticleService {
 
     @Autowired
     private Repository repository;
+
+    @Autowired
+    private UserService userService;
 
     public String create(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
         Article article = new Article(userId, articleId, title, content, tag, category, date, false);
@@ -32,11 +36,13 @@ public class ArticleService {
 
     }
 
-    public String createV2(User user, String articleId, String title, String content, String tag, String category, Instant date) {
-        Article article = new Article(user.getUserId(), articleId, title, content, tag, category, date, false);
+    public String createV2(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
+        Article article = new Article(userId, articleId, title, content, tag, category, date, false);
+        User user = userService.getUser(userId);
 
         repository.saveArticle(article);
         articleId = user.addArticle(article);
+        repository.saveUser(user);
 
         article = user.findArticleById(articleId);
 
