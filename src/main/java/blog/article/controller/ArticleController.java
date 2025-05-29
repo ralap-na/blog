@@ -82,6 +82,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public ResponseEntity<Article> getArticle(@PathVariable String articleId){
+
         Article article = articleService.getArticle(articleId);
 
         if(article != null){
@@ -93,7 +94,11 @@ public class ArticleController {
     }
 
     @PutMapping("/{articleId}")
-    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId){
+    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
 
         JSONObject jsonObject = new JSONObject(info);
 
@@ -103,10 +108,10 @@ public class ArticleController {
         String category = jsonObject.getString("category");
 
         if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+            return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
         }
 
-        Boolean message = articleService.update(articleId, title, content, tag, category);
+        Boolean message = articleService.update(userId, articleId, title, content, tag, category);
 
         if(message){
             return ResponseEntity.ok().build();

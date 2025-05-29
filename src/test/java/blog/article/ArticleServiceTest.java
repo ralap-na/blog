@@ -127,11 +127,12 @@ public class ArticleServiceTest {
         String tag = "Updated Tag";
         String category = "Updated Category";
 
-        Boolean success = articleService.update(articleId, title, content, tag, category);
+        Boolean success = articleService.update(userId, articleId, title, content, tag, category);
 
         assertEquals(true, success);
 
-        Article updatedArticle = repository.findArticleById(articleId);
+        User user = repository.findUserById(userId);
+        Article updatedArticle = user.findArticleById(articleId);
         assertEquals("Updated Title", updatedArticle.getTitle());
         assertEquals("Updated Content", updatedArticle.getContent());
         assertEquals("Updated Tag", updatedArticle.getTag());

@@ -39,6 +39,23 @@ public class User {
         return article.getArticleId();
     }
 
+    public Article updateArticle(String articleId, String title, String content, String tag, String category){
+        Article article = findArticleById(articleId);
+        if(article != null){
+            article.update(title, content, tag, category);
+            for (int i = 0; i < articleList.size(); i++) {
+                if (articleList.get(i).getArticleId() == articleId) {
+                    articleList.set(i, article);
+                    break; // 找到後就退出迴圈
+                }
+            }
+        }
+        else{
+            return null;
+        }
+        return article;
+    }
+
     public Article findArticleById(String articleId){
         if (articleId == null || articleList == null) return null;
 

@@ -200,7 +200,7 @@ class ArticleControllerTest {
 
         // 驗證文章 userId 為 "1"
         for (Article article : articles) {
-            assertEquals(userId, article.getUserId(), "Each article should belong to userId = 1");
+            assertEquals(userId, article.getUserId(), "Each article should belong to userId = " + userId);
         }
 
     }
@@ -308,9 +308,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "Updated Tag");
         requestBody.put("category", "Updated Category");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -325,7 +329,8 @@ class ArticleControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById(articleId);
+        User user = repository.findUserById(userId);
+        Article updatedArticle = user.findArticleById(articleId);
         assertEquals("Updated Title", updatedArticle.getTitle());
         assertEquals("Updated Content", updatedArticle.getContent());
         assertEquals("Updated Tag", updatedArticle.getTag());
@@ -342,9 +347,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "invalid");
         requestBody.put("category", "invalid");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -369,9 +378,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "invalid");
         requestBody.put("category", "");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -383,8 +396,8 @@ class ArticleControllerTest {
         );
 
         // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot be Empty.", response.getBody());
     }
 
     @Test

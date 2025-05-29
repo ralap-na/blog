@@ -54,13 +54,13 @@ public class ArticleService {
         return article;
     }
 
-    public Boolean update(String articleId, String title, String content, String tag, String category){
-        Article article = repository.findArticleById(articleId);
+    public Boolean update(String userId, String articleId, String title, String content, String tag, String category){
+        User user = repository.findUserById(userId);
+        Article article = user.updateArticle(articleId, title, content, tag, category);
 
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
-        article.update(title, content, tag, category);
         repository.saveArticle(article);
         return true;
     }
