@@ -1,8 +1,10 @@
 package blog.article;
 
+import blog.article.service.ArticleService;
 import blog.user.User;
 import net.minidev.json.JSONObject;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// RANDOM_PORT 會自動分配測試端口
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ArticleControllerTest {
 
@@ -28,17 +31,35 @@ class ArticleControllerTest {
 
     @Autowired
     private Repository repository; // 注入 Repository 以準備測試數據
+    @Autowired
+    private ArticleService articleService;
 
     private String baseUrl;
+    private String userId;
 
     @BeforeEach
     public void setUp() {
-        // 設定基礎 URL，RANDOM_PORT 會自動分配測試端口
+        // 設定基礎 URL，
         baseUrl = "/article";
 
         repository.clear();
-        repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
-        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
+        userId = repository.findUserByUsername("Admin").get().getUserId();
+
+        Article article1 = new Article(userId, "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false);
+        Article article2 = new Article(userId, "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false);
+
+        User user = repository.findUserByUsername("Admin").get();
+        user.addArticle(article1);
+        user.addArticle(article2);
+
+        repository.saveArticle(article1);
+        repository.saveArticle(article2);
+        repository.saveUser(user);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        repository.clear();
     }
 
     @Test
@@ -92,7 +113,6 @@ class ArticleControllerTest {
     public void createArticleFail() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
-        requestBody.put("userId", "1");
         requestBody.put("articleId", "3");
         requestBody.put("title", "");
         requestBody.put("content", "Created Content");
@@ -146,7 +166,7 @@ class ArticleControllerTest {
         org.json.JSONObject jsonObject = new org.json.JSONObject(response.getBody());
 
         assertEquals("1", jsonObject.getString("articleId"));
-        assertEquals("1", jsonObject.getString("userId"));
+        assertEquals(userId, jsonObject.getString("userId"));
         assertEquals("Original Title", jsonObject.getString("title"));
         assertEquals("Original Content", jsonObject.getString("content"));
         assertEquals("Original Tag", jsonObject.getString("tag"));
@@ -155,7 +175,6 @@ class ArticleControllerTest {
 
     @Test
     public void getArticlesByUserId(){
-        String userId = "1";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -252,8 +271,6 @@ class ArticleControllerTest {
     @Test
     public void getAllDeletedArticlesByUserId(){
         repository.delete("1");
-
-        String userId = "1";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -372,7 +389,6 @@ class ArticleControllerTest {
 
     @Test
     public void deleteArticle(){
-        String userId = "1";
         String articleId = "1";
 
         HttpHeaders headers = new HttpHeaders();
@@ -392,7 +408,6 @@ class ArticleControllerTest {
 
     @Test
     public void recoverArticle(){
-        String userId = "1";
         String articleId = "1";
 
         repository.delete(articleId);

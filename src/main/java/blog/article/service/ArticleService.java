@@ -40,8 +40,9 @@ public class ArticleService {
     }
 
     public Collection<Article> getArticlesByUserId(String userId){
+        User user = userService.getUser(userId);
 
-        return repository.findArticlesByUserId(userId);
+        return user.getArticleList();
     }
 
     public Article getArticle(String articleId) {

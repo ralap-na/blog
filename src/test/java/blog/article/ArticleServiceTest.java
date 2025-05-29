@@ -21,13 +21,16 @@ public class ArticleServiceTest {
     @Autowired
     private Repository repository;
 
-    Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+    private Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+    private String userId;
 
     @BeforeEach
     void setUp() {
         repository.clear();
+        User user = repository.findUserByUsername("Admin").get();
+        userId = user.getUserId();
         Article article = new Article();
-        article.setUserId("1");
+        article.setUserId(userId);
         article.setArticleId("1");
         article.setTitle("Original Title");
         article.setContent("Original Content");
@@ -35,7 +38,9 @@ public class ArticleServiceTest {
         article.setCategory("Original Category");
         article.setDate(fixedTime);
         article.setDeleted(false);
+        user.addArticle(article);
         repository.saveArticle(article);
+        repository.saveUser(user);
     }
 
     @Test
@@ -106,11 +111,11 @@ public class ArticleServiceTest {
 
     @Test
     public void getArticlesByUserId(){
-        repository.saveArticle(new Article("2", "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
+        repository.saveArticle(new Article(userId, "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
 
-        Collection<Article> articles = articleService.getArticlesByUserId("1");
+        Collection<Article> articles = articleService.getArticlesByUserId(userId);
         for(Article a : articles){
-            assertEquals("1", a.getUserId());
+            assertEquals(userId, a.getUserId());
         }
     }
 
@@ -135,29 +140,29 @@ public class ArticleServiceTest {
 
     @Test
     public void deleteArticle(){
-        boolean success = articleService.delete("1", "1");
+        boolean success = articleService.delete(userId, "1");
 
         assertTrue(success);
     }
 
     @Test
     public void deleteNotExistArticle(){
-        boolean fail = articleService.delete("1", "2");
+        boolean fail = articleService.delete(userId, "2");
 
         assertFalse(fail);
     }
 
     @Test
     public void recoverArticle(){
-        articleService.delete("1", "1");
-        boolean success = articleService.recover("1", "1");
+        articleService.delete(userId, "1");
+        boolean success = articleService.recover(userId, "1");
 
         assertTrue(success);
     }
 
     @Test
     public void recoverNotExistArticle(){
-        boolean fail = articleService.recover("1", "1");
+        boolean fail = articleService.recover(userId, "1");
 
         assertFalse(fail);
     }
