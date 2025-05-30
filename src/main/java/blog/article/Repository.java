@@ -26,6 +26,7 @@ public class Repository {
 
     public void clear(){
         articleList.clear();
+        CommentList.clear();
         deletedArticleList.clear();
     }
 
