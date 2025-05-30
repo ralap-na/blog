@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -57,5 +59,9 @@ public class UserService {
 
     public User getUser(String userId) {
         return repository.findUserById(userId);
+    }
+
+    public Map<String, String> getUsernames(List<String> userIds) {
+        return repository.findUsernamesByUserId(userIds);
     }
 }

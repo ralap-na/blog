@@ -1,6 +1,6 @@
-package blog.article;
+package blog.chat;
 
-import blog.chat.Chat;
+import blog.article.*;
 import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class Repository {
+public class FakeRepository extends Repository {
 
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
@@ -155,24 +155,10 @@ public class Repository {
         userList.put(user.getUserId(), user);
     }
 
-    public Map<String, String> findUsernamesByUserId(List<String> userIds) {
-        Map<String, String> result = new HashMap<>();
-        for (String id : userIds) {
-            if (userList.containsKey(id)) {
-                result.put(id, userList.get(id).getUsername());
-            }
-        }
-        return result;
-    }
-
     public User findUserById(String userId) {
         return userList.get(userId);
     }
 
-    public void deleteUser(String userId) {
-        userList.remove(userId);
-    }
-     
     public Notification findNotificationById(String id) {
         return notificationList.get(id);
     }
@@ -242,7 +228,6 @@ public class Repository {
                         chat -> chat
                 ));
     }
-
 
     public boolean findChatsByUsers(String user1Id, String user2Id) {
         for (Chat chat : chatList.values()) {
