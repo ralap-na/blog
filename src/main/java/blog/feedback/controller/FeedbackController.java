@@ -158,7 +158,7 @@ public class FeedbackController {
 
     @PostMapping("/{writerId}/{articleId}/{commentId}/{readerId}/add-reaction")
     public ResponseEntity<String> addReactionOnComment(@PathVariable String writerId, @PathVariable String articleId, @PathVariable String commentId, @PathVariable String readerId, @RequestBody String type){
-        OperationOutcome feedbackOutcome = feedbackService.addReactionOnComment(articleId, commentId, readerId, type);
+        OperationOutcome feedbackOutcome = feedbackService.addReaction(articleId, commentId, readerId, type);
         OperationOutcome notificationOutcome = notificationService.notifyUser(writerId, articleId, "You have received a reaction!", "Someone " + type + " your article!", Instant.now());
 
         if(feedbackOutcome.getState().equals(OutcomeState.SUCCESS) && notificationOutcome.getState().equals(OutcomeState.SUCCESS)){
