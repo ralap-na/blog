@@ -25,6 +25,17 @@ public class Article {
         this.isDeleted = isDeleted;
     }
 
+    public Article(String articleId, String title, String content, String tag, String category, Instant date, Boolean isDeleted) {
+        this.userId = null;
+        this.articleId = articleId;
+        this.title = title;
+        this.content = content;
+        this.tag = tag;
+        this.category = category;
+        this.date = date;
+        this.isDeleted = isDeleted;
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }

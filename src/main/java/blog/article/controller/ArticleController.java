@@ -1,6 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
+import blog.article.Repository;
 import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import blog.article.service.CategoryService;
@@ -36,27 +37,39 @@ public class ArticleController {
     UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity<String> createArticle(@RequestBody String info){
+    public ResponseEntity<String> createArticle(@RequestBody String info, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+
         JSONObject jsonObject = new JSONObject(info);
-        String articleId = UUID.randomUUID().toString();
-        String userId = jsonObject.getString("userId");
         String title = jsonObject.getString("title");
         String content = jsonObject.getString("content");
         String tag = jsonObject.getString("tag");
         String category = jsonObject.getString("category");
-        Instant date = Instant.parse(jsonObject.getString("date"));
+        String dateStr = jsonObject.getString("date");
 
         if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+            return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
         }
 
-        articleId = articleService.create(userId, articleId, title, content, tag, category, date);
+        Instant date;
+        try {
+            date = Instant.parse(dateStr);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid date format.");
+        }
 
-        if(articleId != null){
-            return ResponseEntity.ok().body(articleId);
+        String articleId = UUID.randomUUID().toString();
+
+        String resultId = articleService.create(userId, articleId, title, content, tag, category, date);
+
+        if(resultId != null){
+            return ResponseEntity.ok().body(resultId);
         }
         else{
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Failed to create article.");
         }
     }
 
@@ -69,6 +82,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public ResponseEntity<Article> getArticle(@PathVariable String articleId){
+
         Article article = articleService.getArticle(articleId);
 
         if(article != null){
@@ -80,7 +94,11 @@ public class ArticleController {
     }
 
     @PutMapping("/{articleId}")
-    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId){
+    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
 
         JSONObject jsonObject = new JSONObject(info);
 
@@ -90,10 +108,10 @@ public class ArticleController {
         String category = jsonObject.getString("category");
 
         if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+            return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
         }
 
-        Boolean message = articleService.update(articleId, title, content, tag, category);
+        Boolean message = articleService.update(userId, articleId, title, content, tag, category);
 
         if(message){
             return ResponseEntity.ok().build();

@@ -1,6 +1,7 @@
 package blog.article;
 
 import blog.article.service.ArticleService;
+import blog.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,16 @@ public class ArticleServiceTest {
     @Autowired
     private Repository repository;
 
-    Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+    private Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+    private String userId;
 
     @BeforeEach
     void setUp() {
         repository.clear();
+        User user = repository.findUserByUsername("Admin").get();
+        userId = user.getUserId();
         Article article = new Article();
-        article.setUserId("1");
+        article.setUserId(userId);
         article.setArticleId("1");
         article.setTitle("Original Title");
         article.setContent("Original Content");
@@ -34,15 +38,22 @@ public class ArticleServiceTest {
         article.setCategory("Original Category");
         article.setDate(fixedTime);
         article.setDeleted(false);
+        user.addArticle(article);
         repository.saveArticle(article);
+        repository.saveUser(user);
     }
 
     @Test
     public void saveArticle(){
+        String userId = repository.findUserByUsername("Admin").get().getUserId();
 
-        String articleId = articleService.create("1", "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
+        String articleId = articleService.create(userId, "2", "Saved Title", "Saved Content", "Saved Tag", "Saved Category", fixedTime);
 
         assertEquals("2", articleId);
+
+        User user = repository.findUserByUsername("Admin").get();
+
+        user.clear();
     }
 
     @Test
@@ -100,11 +111,11 @@ public class ArticleServiceTest {
 
     @Test
     public void getArticlesByUserId(){
-        repository.saveArticle(new Article("2", "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
+        repository.saveArticle(new Article(userId, "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
 
-        Collection<Article> articles = articleService.getArticlesByUserId("1");
+        Collection<Article> articles = articleService.getArticlesByUserId(userId);
         for(Article a : articles){
-            assertEquals("1", a.getUserId());
+            assertEquals(userId, a.getUserId());
         }
     }
 
@@ -116,11 +127,12 @@ public class ArticleServiceTest {
         String tag = "Updated Tag";
         String category = "Updated Category";
 
-        Boolean success = articleService.update(articleId, title, content, tag, category);
+        Boolean success = articleService.update(userId, articleId, title, content, tag, category);
 
         assertEquals(true, success);
 
-        Article updatedArticle = repository.findArticleById(articleId);
+        User user = repository.findUserById(userId);
+        Article updatedArticle = user.findArticleById(articleId);
         assertEquals("Updated Title", updatedArticle.getTitle());
         assertEquals("Updated Content", updatedArticle.getContent());
         assertEquals("Updated Tag", updatedArticle.getTag());
@@ -129,29 +141,29 @@ public class ArticleServiceTest {
 
     @Test
     public void deleteArticle(){
-        boolean success = articleService.delete("1", "1");
+        boolean success = articleService.delete(userId, "1");
 
         assertTrue(success);
     }
 
     @Test
     public void deleteNotExistArticle(){
-        boolean fail = articleService.delete("1", "2");
+        boolean fail = articleService.delete(userId, "2");
 
         assertFalse(fail);
     }
 
     @Test
     public void recoverArticle(){
-        articleService.delete("1", "1");
-        boolean success = articleService.recover("1", "1");
+        articleService.delete(userId, "1");
+        boolean success = articleService.recover(userId, "1");
 
         assertTrue(success);
     }
 
     @Test
     public void recoverNotExistArticle(){
-        boolean fail = articleService.recover("1", "1");
+        boolean fail = articleService.recover(userId, "1");
 
         assertFalse(fail);
     }

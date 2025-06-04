@@ -2,6 +2,8 @@ package blog.article.service;
 
 import blog.article.Article;
 import blog.article.Repository;
+import blog.user.User;
+import blog.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,18 @@ public class ArticleService {
     @Autowired
     private Repository repository;
 
+    @Autowired
+    private UserService userService;
+
     public String create(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
         Article article = new Article(userId, articleId, title, content, tag, category, date, false);
+        User user = userService.getUser(userId);
 
         repository.saveArticle(article);
+        articleId = user.addArticle(article);
+        repository.saveUser(user);
 
-        article = repository.findArticleById(articleId);
+        article = user.findArticleById(articleId);
 
         if(article == null){
             return null;
@@ -32,8 +40,9 @@ public class ArticleService {
     }
 
     public Collection<Article> getArticlesByUserId(String userId){
+        User user = userService.getUser(userId);
 
-        return repository.findArticlesByUserId(userId);
+        return user.getArticleList();
     }
 
     public Article getArticle(String articleId) {
@@ -45,13 +54,13 @@ public class ArticleService {
         return article;
     }
 
-    public Boolean update(String articleId, String title, String content, String tag, String category){
-        Article article = repository.findArticleById(articleId);
+    public Boolean update(String userId, String articleId, String title, String content, String tag, String category){
+        User user = repository.findUserById(userId);
+        Article article = user.updateArticle(articleId, title, content, tag, category);
 
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
-        article.update(title, content, tag, category);
         repository.saveArticle(article);
         return true;
     }
