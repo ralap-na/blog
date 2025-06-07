@@ -20,7 +20,6 @@ public class Repository {
     private final Map<String, Comment> commentList = new HashMap<>();
     private final Map<String, Reaction> reactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
-    private final Map<String, Bookmark> bookmarkList = new HashMap<>();
     private final Map<String, Category> categoryList = new HashMap<>();
     private final Map<String, Chat> chatList = new HashMap<>();
 
@@ -209,12 +208,16 @@ public class Repository {
         notificationList.remove(notificationId);
     }
 
-    public void saveBookmark(Bookmark bookmark) {
-        bookmarkList.put(bookmark.getUserId(), bookmark);
-    }
-
-    public Bookmark findBookmarkByUserId(String userId){
-        return bookmarkList.get(userId);
+    public Bookmark findBookmarkById(String bookmarkId) {
+        for (User user : userList.values()) {
+            if (user.getBookmarkList() != null) {
+                Bookmark bookmark = user.findBookmarkById(bookmarkId);
+                if (bookmark != null) {
+                    return bookmark;
+                }
+            }
+        }
+        return null;
     }
 
     @PostConstruct
