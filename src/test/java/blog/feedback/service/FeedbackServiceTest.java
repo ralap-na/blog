@@ -50,7 +50,7 @@ public class FeedbackServiceTest {
         articleService.create(articleOwnerId, articleId, "Article Title", "Article Content", "Tag", "Category", Instant.now());
 
         repository.clearFeedback();
-        articleService.create("articleOwner", articleId, "Article Title", "Article Content", "Tag", "Category", Instant.now());
+        articleService.create(articleOwnerId, articleId, "Article Title", "Article Content", "Tag", "Category", Instant.now());
     }
 
     @AfterEach
@@ -144,7 +144,7 @@ public class FeedbackServiceTest {
         OperationOutcome createOutcome = feedbackService.createComment(articleId, testerId, content, Instant.now());
         String commentId = createOutcome.getId();
 
-        OperationOutcome outcome = feedbackService.addReaction(articleId, commentId, userId, "like");
+        OperationOutcome outcome = feedbackService.addReaction(articleId, commentId, testerId, "like");
       
         assertEquals(OutcomeState.SUCCESS, outcome.getState());
     }
