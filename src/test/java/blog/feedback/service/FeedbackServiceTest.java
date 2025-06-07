@@ -5,8 +5,6 @@ import blog.article.service.ArticleService;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import blog.user.service.UserService;
-import blog.feedback.Comment;
-import blog.feedback.Reaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +23,6 @@ public class FeedbackServiceTest {
     private Repository repository;
     @Autowired
     private FeedbackService feedbackService;
-
     @Autowired
     private UserService userService;
 
@@ -130,6 +124,7 @@ public class FeedbackServiceTest {
         String commentId = createOutcome.getId();
 
         var comment = feedbackService.getCommentById(commentId);
+
         assertEquals(commentId, comment.getId());
     }
 
@@ -143,9 +138,7 @@ public class FeedbackServiceTest {
     public void add_reaction_on_comment() {
         OperationOutcome createOutcome = feedbackService.createComment(articleId, testerId, content, Instant.now());
         String commentId = createOutcome.getId();
-
         OperationOutcome outcome = feedbackService.addReaction(articleId, commentId, testerId, "like");
-      
         assertEquals(OutcomeState.SUCCESS, outcome.getState());
     }
 }

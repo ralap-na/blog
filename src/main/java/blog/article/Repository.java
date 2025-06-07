@@ -17,7 +17,6 @@ public class Repository {
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
-    private final Map<String, Comment> commentList = new HashMap<>();
     private final Map<String, Reaction> reactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Category> categoryList = new HashMap<>();
@@ -25,7 +24,6 @@ public class Repository {
 
     public void clear(){
         articleList.clear();
-        commentList.clear();
         deletedArticleList.clear();
     }
 
@@ -106,30 +104,50 @@ public class Repository {
 
     // Comment
     public void clearFeedback(){
-        commentList.clear();
         reactionList.clear();
     }
 
     public Comment findCommentById(String commentId){
-        return commentList.get(commentId);
+        return  userList.values().stream()
+                .map(user -> user.getCommentById(commentId))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 
     public List<Comment> findCommentsByArticleId(String articleId){
-        return commentList.values().stream()
-                .filter(comment -> comment.getArticleId().equals(articleId))
-                .toList();
+        return userList.values().stream()
+                .flatMap(user -> user.getCommentList().stream()
+                        .filter(comment -> comment.getArticleId().equals(articleId)))
+                .collect(Collectors.toList());
     }
 
     public List<Comment> findAllComments(){
-        return commentList.values().stream().toList();
+        return userList.values().stream()
+                .flatMap(user -> user.getCommentList().stream())
+                .collect(Collectors.toList());
     }
 
     public void saveComment(Comment comment) {
-        commentList.put(comment.getId(), comment);
+        User user = userList.get(comment.getUserId());
+        if (user != null) {
+            user.addComment(comment);
+            userList.put(user.getUserId(), user);
+        } else {
+            throw new IllegalArgumentException("User not found for comment: " + comment.getId());
+        }
     }
 
     public void deleteComment(String commentId) {
-        commentList.remove(commentId);
+        for (User user : userList.values()) {
+            Comment comment = user.getCommentById(commentId);
+            if (comment != null) {
+                user.deleteComment(commentId);
+                userList.put(user.getUserId(), user);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Comment not found: " + commentId);
     }
 
     // Reaction

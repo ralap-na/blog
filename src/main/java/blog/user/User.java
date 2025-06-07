@@ -1,6 +1,7 @@
 package blog.user;
 
 import blog.article.Article;
+import blog.feedback.Comment;
 import blog.article.Bookmark;
 
 import java.util.ArrayList;
@@ -13,12 +14,14 @@ public class User {
 
     private List<Article> articleList;
     private List<Article> deletedArticleList;
+    private final List<Comment> commentList;
     private List<Bookmark> bookmarkList;
 
     public User(String userId, String username, String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;
+        commentList = new ArrayList<>();
     }
 
     public void clear(){
@@ -158,6 +161,26 @@ public class User {
         this.password = password;
 
     }
+
+    public void addComment(Comment comment) {
+        commentList.add(comment);
+    }
+
+    public Comment getCommentById(String commentId) {
+        return commentList.stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<Comment> getCommentList() {
+        return commentList;
+    }
+
+    public void deleteComment(String commentId) {
+        commentList.removeIf(comment -> comment.getId().equals(commentId));
+    }
+  
     public List<Bookmark> getBookmarkList() {
         if (bookmarkList == null) {
             bookmarkList = new ArrayList<>();
