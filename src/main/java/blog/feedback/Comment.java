@@ -1,6 +1,8 @@
 package blog.feedback;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Comment {
     private String id;
@@ -8,6 +10,7 @@ public class Comment {
     private String userId;
     private String content;
     private Instant date;
+    private List<Reaction> reactionList;
 
     public Comment(String id, String articleId, String userId, String content, Instant date) {
         this.id = id;
@@ -15,6 +18,7 @@ public class Comment {
         this.userId = userId;
         this.content = content;
         this.date = date;
+        reactionList = new ArrayList<>();
     }
 
     public void update(String content, Instant date) {
@@ -56,6 +60,18 @@ public class Comment {
 
     public Instant getDate() {
         return date;
+    }
+
+    public void addReaction(Reaction reaction) {
+        reactionList.add(reaction);
+    }
+
+    public void removeReaction(Reaction reaction) {
+        reactionList.remove(reaction);
+    }
+
+    public boolean hasReaction(String reactionId) {
+        return reactionList.stream().anyMatch(reaction -> reaction.getId().equals(reactionId));
     }
 
     public void setDate(Instant date) {

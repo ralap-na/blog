@@ -5,6 +5,8 @@ import blog.article.service.ArticleService;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import blog.user.service.UserService;
+import blog.feedback.Comment;
+import blog.feedback.Reaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,12 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FeedbackServiceTest {
     @Autowired
     private ArticleService articleService;
-
-    @Autowired
-    private FeedbackService feedbackService;
-
     @Autowired
     private Repository repository;
+    @Autowired
+    private FeedbackService feedbackService;
 
     @Autowired
     private UserService userService;
@@ -37,6 +40,7 @@ public class FeedbackServiceTest {
     @BeforeEach
     public void setUp() {
         repository.clear();
+
         userService.createUser("Tester", "Tester");
         userService.createUser("ArticleOwner", "ArticleOwner");
 
@@ -44,6 +48,9 @@ public class FeedbackServiceTest {
         articleOwnerId = repository.findUserByUsername("ArticleOwner").get().getUserId();
 
         articleService.create(articleOwnerId, articleId, "Article Title", "Article Content", "Tag", "Category", Instant.now());
+
+        repository.clearFeedback();
+        articleService.create("articleOwner", articleId, "Article Title", "Article Content", "Tag", "Category", Instant.now());
     }
 
     @AfterEach
@@ -51,6 +58,7 @@ public class FeedbackServiceTest {
         repository.deleteUser(testerId);
         repository.deleteUser(articleOwnerId);
         repository.clear();
+        repository.clearFeedback();
     }
 
     @Test
@@ -136,7 +144,8 @@ public class FeedbackServiceTest {
         OperationOutcome createOutcome = feedbackService.createComment(articleId, testerId, content, Instant.now());
         String commentId = createOutcome.getId();
 
-        OperationOutcome outcome = feedbackService.addReactionOnComment(articleId, commentId, testerId, "like");
+        OperationOutcome outcome = feedbackService.addReaction(articleId, commentId, userId, "like");
+      
         assertEquals(OutcomeState.SUCCESS, outcome.getState());
     }
 }
