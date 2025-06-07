@@ -57,8 +57,21 @@ public class BookmarkService {
     public boolean addBookmark(String bookmarkId, String bookmarkName, String userId) {
         Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
         User user = userService.getUser(userId);
+        if (user == null) {
+            return false;
+        }
         user.addBookmark(bookmark);
         repository.saveUser(user);
+        return true;
+    }
+
+    public boolean deleteBookmark(String bookmarkId, String userId) {
+        User user = userService.getUser(userId);
+        if (user == null) {
+            return false;
+        }
+        Bookmark bookmark = repository.findBookmarkById(bookmarkId);
+        user.deleteBookmark(bookmark);
         return true;
     }
 }

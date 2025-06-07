@@ -201,4 +201,10 @@ public class User {
         getBookmarkList().add(bookmark);
         return bookmark.getBookmarkId();
     }
+    public boolean deleteBookmark(Bookmark bookmark){
+        if (bookmark == null || bookmarkList == null) return false;
+
+        bookmarkList.remove(bookmark);
+        return true;
+    }
 }
