@@ -281,6 +281,39 @@ public class ArticleController {
         }
     }
 
+    @PutMapping("/bookmark/{bookmarkName}")
+    public ResponseEntity<String> addBookmark(@PathVariable(value="bookmarkName") String bookmarkName, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+        String bookmarkId = UUID.randomUUID().toString();
+        boolean message = bookmarkService.addBookmark(bookmarkId, bookmarkName, userId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/bookmark/{bookmarkId}")
+    public ResponseEntity<String> deleteBookmark(@PathVariable String bookmarkId, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+        boolean message = bookmarkService.deleteBookmark(bookmarkId, userId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/category/create")
     public ResponseEntity<String> createCategory(@RequestParam String name, HttpSession session) {
 

@@ -109,6 +109,36 @@ public class BookmarkServiceTest {
 
         assertTrue(bookmarkList.contains(bookmark_1));
         assertTrue(bookmarkList.contains(bookmark_2));
+        assertEquals(3, bookmarkList.size());
+    }
+
+    @Test
+    public void addBookmark(){
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark";
+        boolean message = bookmarkService.addBookmark(bookmarkId, bookmarkName, testerId);
+        List<Bookmark> bookmarkList = bookmarkService.getBookmarks(testerId);
+
+        assertTrue(message);
+        assertEquals(2, bookmarkList.size());
+    }
+
+    @Test
+    public void deleteBookmark(){
+        String bookmarkId_1 = "b1";
+        String bookmarkName_1 = "Bookmark-1";
+        String bookmarkId_2 = "b2";
+        String bookmarkName_2 = "Bookmark-2";
+        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1);
+        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2);
+        User user = repository.findUserById(testerId);
+        user.addBookmark(bookmark_1);
+        user.addBookmark(bookmark_2);
+        List<Bookmark> bookmarkList = bookmarkService.getBookmarks(testerId);
+
+        assertEquals(3, bookmarkList.size());
+        bookmarkService.deleteBookmark(bookmarkId_2, testerId);
+        bookmarkList = bookmarkService.getBookmarks(testerId);
         assertEquals(2, bookmarkList.size());
     }
 }
