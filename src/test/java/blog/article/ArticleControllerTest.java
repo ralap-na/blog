@@ -559,6 +559,54 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void addBookmark() {
+        String bookmarkName = "Bookmark-1";
+
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + bookmarkName,
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteBookmark() {
+        String bookmarkId = "b1";
+        String bookmarkName = "Bookmark-1";
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
+        User user = repository.findUserById(userId);
+        user.addBookmark(bookmark);
+
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/bookmark/" + bookmarkId,
+                HttpMethod.DELETE,
+                request,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
     public void createCategorySuccess_withAdminLogin() {
         // 先登入取得 cookie
         String cookie = loginAsAdminAndGetCookie();
