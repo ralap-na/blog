@@ -31,65 +31,78 @@ public class Repository {
     }
 
     public Collection<Article> findAllArticles(){
-        return articleList.values();
+        List<Article> allArticles = new ArrayList<>();
+        for (User user : userList.values()) {
+            if (user.getArticleList() != null) {
+                allArticles.addAll(user.getArticleList());
+            }
+        }
+        return allArticles;
     }
 
     public Collection<Article> findAllDeletedArticlesByUserId(String userId){
-        Collection<Article> articles = deletedArticleList.values();
-        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
-        return articles;
+        User user = userList.get(userId);
+        return user.getDeletedArticleList();
     }
 
     public Article findArticleById(String articleId){
-        return articleList.get(articleId);
+        for (User user : userList.values()) {
+            if (user.getArticleList() != null){
+                Collection<Article> articles = user.getArticleList();
+                if(!articles.isEmpty()){
+                    Optional<Article> result = articles.stream().filter(article -> article.getArticleId().equals(articleId)).findFirst();
+                    if (result.isPresent()) {
+                        return result.get();
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public Collection<Article> findArticlesByUserId(String userId){
-        Collection<Article> articles = articleList.values();
-        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
-        return articles;
+        User user = userList.get(userId);
+        return user.getArticleList();
     }
 
     public Collection<Article> findArticlesByTitle(String keyword){
-        Collection<Article> articles = articleList.values();
-        articles = articles.stream().filter(article -> article.getTitle().contains(keyword)).toList();
-        return articles;
+        List<Article> allArticles = new ArrayList<>();
+        for (User user : userList.values()) {
+            if (user.getArticleList() != null){
+                Collection<Article> articles = user.getArticleList();
+                articles = articles.stream().filter(article -> article.getTag().contains(keyword)).toList();
+                allArticles.addAll(articles);
+            }
+        }
+        return allArticles;
     }
 
     public Collection<Article> findArticlesByTag(String tag){
-        Collection<Article> articles = articleList.values();
-        articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
-        return articles;
+        List<Article> allArticles = new ArrayList<>();
+        for (User user : userList.values()) {
+            if (user.getArticleList() != null){
+                Collection<Article> articles = user.getArticleList();
+                articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
+                allArticles.addAll(articles);
+            }
+        }
+        return allArticles;
     }
 
     public Collection<Article> findArticlesByCategory(String category){
-        Collection<Article> articles = articleList.values();
-        articles = articles.stream().filter(article -> article.getCategory().equals(category)).toList();
-        return articles;
+        List<Article> allArticles = new ArrayList<>();
+        for (User user : userList.values()) {
+            if (user.getArticleList() != null){
+                Collection<Article> articles = user.getArticleList();
+                articles = articles.stream().filter(article -> article.getTag().contains(category)).toList();
+                allArticles.addAll(articles);
+            }
+        }
+        return allArticles;
     }
 
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
-    }
-
-    public Article findDeletedArticleById(String articleId){
-        return deletedArticleList.get(articleId);
-    }
-
-    public void delete(String articleId) {
-        Article article = articleList.get(articleId);
-        article.delete();
-        articleList.remove(articleId);
-
-        deletedArticleList.put(articleId, article);
-    }
-
-    public void recover(String articleId){
-        Article article = deletedArticleList.get(articleId);
-        article.recover();
-        deletedArticleList.remove(articleId);
-
-        articleList.put(articleId, article);
     }
 
     // Comment
