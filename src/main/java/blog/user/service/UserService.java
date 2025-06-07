@@ -1,5 +1,6 @@
 package blog.user.service;
 
+import blog.article.Bookmark;
 import blog.article.Repository;
 import blog.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class UserService {
         String hashPassword = passwordEncoder.encode(password);
         User user = new User(UUID.randomUUID().toString(), username, hashPassword);
 
+        user.addBookmark(new Bookmark(UUID.randomUUID().toString(), "default"));
         repository.saveUser(user);
 
         return true;
