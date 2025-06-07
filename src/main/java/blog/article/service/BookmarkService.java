@@ -2,6 +2,8 @@ package blog.article.service;
 
 import blog.article.Bookmark;
 import blog.article.Repository;
+import blog.user.User;
+import blog.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,11 @@ import java.util.List;
 public class BookmarkService {
     @Autowired
     private Repository repository;
+    @Autowired
+    private UserService userService;
 
     public boolean addArticle(String bookmarkId, String articleId) {
-        Bookmark bookmark = repository.findBookmarkByBookmarkId(bookmarkId);
+        Bookmark bookmark = repository.findBookmarkById(bookmarkId);
 
         if (bookmark == null) {
             return false;
@@ -24,7 +28,7 @@ public class BookmarkService {
     }
 
     public boolean deleteArticle(String bookmarkId, String articleId) {
-        Bookmark bookmark = repository.findBookmarkByBookmarkId(bookmarkId);
+        Bookmark bookmark = repository.findBookmarkById(bookmarkId);
 
         if (bookmark == null) {
             return false;
@@ -35,7 +39,7 @@ public class BookmarkService {
     }
 
     public List<String> getArticleIds(String bookmarkId) {
-        Bookmark bookmark = repository.findBookmarkByBookmarkId(bookmarkId);
+        Bookmark bookmark = repository.findBookmarkById(bookmarkId);
 
         if (bookmark == null) {
             return null;
@@ -45,19 +49,16 @@ public class BookmarkService {
     }
 
     public List<Bookmark> getBookmarks(String userId) {
-        List<Bookmark> bookmarkList = repository.findBookmarksByUserId(userId);
+        User user = userService.getUser(userId);
 
-        if (bookmarkList == null) {
-            return null;
-        }
-
-        return bookmarkList;
+        return user.getBookmarkList();
     }
 
     public boolean addBookmark(String bookmarkId, String bookmarkName, String userId) {
-        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
-
-        repository.saveBookmark(bookmark);
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
+        User user = userService.getUser(userId);
+        user.addBookmark(bookmark);
+        repository.saveUser(user);
         return true;
     }
 }

@@ -447,11 +447,11 @@ class ArticleControllerTest {
 
     @Test
     public void addToBookmark() {
-        String userId = "u1";
         String bookmarkId = "b1";
         String bookmarkName = "Bookmark-1";
-        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
-        repository.saveBookmark(bookmark);
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
+        User user = repository.findUserById(userId);
+        user.addBookmark(bookmark);
         String articleId = "a1";
 
         HttpHeaders headers = new HttpHeaders();
@@ -470,7 +470,6 @@ class ArticleControllerTest {
 
     @Test
     public void deleteFromBookmark() {
-        String userId = "u1";
         String articleId = "a1";
         Article article = new Article();
         article.setArticleId(articleId);
@@ -479,9 +478,10 @@ class ArticleControllerTest {
 
         String bookmarkId = "b1";
         String bookmarkName = "Bookmark-1";
-        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
         bookmark.addArticle(article.getArticleId());
-        repository.saveBookmark(bookmark);
+        User user = repository.findUserById(userId);
+        user.addBookmark(bookmark);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -509,11 +509,11 @@ class ArticleControllerTest {
         article2.setUserId("u1");
         repository.saveArticle(article2);
 
-        String userId = "u1";
         String bookmarkId = "b1";
         String bookmarkName = "Bookmark-1";
-        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName, userId);
-        repository.saveBookmark(bookmark);
+        Bookmark bookmark = new Bookmark(bookmarkId, bookmarkName);
+        User user = repository.findUserById(userId);
+        user.addBookmark(bookmark);
 
         bookmark.addArticle(article1.getArticleId());
         bookmark.addArticle(article2.getArticleId());
@@ -534,15 +534,15 @@ class ArticleControllerTest {
 
     @Test
     public void getBookmarksByUserId() {
-        String userId = "u1";
         String bookmarkId_1 = "b1";
         String bookmarkName_1 = "Bookmark-1";
         String bookmarkId_2 = "b2";
         String bookmarkName_2 = "Bookmark-2";
-        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1, userId);
-        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2, userId);
-        repository.saveBookmark(bookmark_1);
-        repository.saveBookmark(bookmark_2);
+        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1);
+        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2);
+        User user = repository.findUserById(userId);
+        user.addBookmark(bookmark_1);
+        user.addBookmark(bookmark_2);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

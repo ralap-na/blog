@@ -177,10 +177,6 @@ public class FakeRepository extends Repository {
         notificationList.remove(notificationId);
     }
 
-    public void saveBookmark(Bookmark bookmark) {
-        bookmarkList.put(bookmark.getUserId(), bookmark);
-    }
-
     public Bookmark findBookmarkByUserId(String userId){
         return bookmarkList.get(userId);
     }

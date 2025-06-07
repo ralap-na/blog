@@ -19,7 +19,7 @@ public class BookmarkTest {
         article2.setUserId("u2");
         article2.setArticleId("a2");
 
-        Bookmark bookmark = new Bookmark("b1", "Bookmark-1", "u3");
+        Bookmark bookmark = new Bookmark("b1", "Bookmark-1");
         bookmark.addArticle(article1.getArticleId());
         bookmark.addArticle(article2.getArticleId());
 
@@ -38,7 +38,7 @@ public class BookmarkTest {
         article2.setUserId("u2");
         article2.setArticleId("a2");
 
-        Bookmark bookmark = new Bookmark("b1", "Bookmark-1", "u3");
+        Bookmark bookmark = new Bookmark("b1", "Bookmark-1");
         bookmark.addArticle(article1.getArticleId());
         bookmark.addArticle(article2.getArticleId());
 
