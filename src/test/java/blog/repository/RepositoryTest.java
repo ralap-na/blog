@@ -4,6 +4,7 @@ import blog.article.Article;
 import blog.article.Bookmark;
 import blog.article.Category;
 import blog.article.Repository;
+import blog.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,26 +27,17 @@ public class RepositoryTest {
     }
 
     @Test
-    public void saveArticle(){
-        Article article = buildTestArticle("1", "Saved", false);
+    public void findAllArticles(){
+        Article article = buildTestArticle("Admin", "1", "FindAll", false);
+        Article article2 = buildTestArticle("Other", "2", "FindAll", false);
 
-        repository.saveArticle(article);
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
 
-        Article savedArticle = repository.findArticleById("1");
-
-        assertEquals("Saved Title", savedArticle.getTitle());
-        assertEquals("Saved Content", savedArticle.getContent());
-        assertEquals("Saved Tag", savedArticle.getTag());
-        assertEquals("Saved Category", savedArticle.getCategory());
-    }
-
-    @Test
-    public void findAllArticle(){
-        Article article = buildTestArticle("1", "A", false);
-        Article article2 = buildTestArticle("2", "B", false);
-
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
 
         Collection<Article> articles = repository.findAllArticles();
 
@@ -54,126 +46,119 @@ public class RepositoryTest {
 
     @Test
     public void findAllDeletedArticlesByUserId(){
-        Article article = buildTestArticle("1", "A", false);
-        Article article2 = buildTestArticle("2", "B", false);
+        Article article = buildTestArticle("Admin", "1", "FindAllDeleted", false);
+        Article article2 = buildTestArticle("Other", "2", "FindAllDeleted", false);
 
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
-        repository.delete("1");
-        repository.delete("2");
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
 
-        Collection<Article> articles = repository.findAllDeletedArticlesByUserId("2");
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
+
+        user.deleteArticle(article.getArticleId());
+        user2.deleteArticle(article2.getArticleId());
+
+        Collection<Article> articles = repository.findAllDeletedArticlesByUserId("Admin");
 
         assertEquals(1, articles.size());
 
         for(Article a : articles){
             assertTrue(a.getDeleted());
-            assertEquals("2", a.getUserId());
-        }
-    }
-
-    @Test
-    public void findArticlesByTag(){
-        Article article = buildTestArticle("1", "A", false);
-        Article article2 = buildTestArticle("2", "B", false);
-
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
-
-        Collection<Article> articles = repository.findArticlesByTag("B");
-
-        for(Article a : articles){
-            assertEquals("B Tag", a.getTag());
-        }
-    }
-
-    @Test
-    public void findArticlesByCategory(){
-        Article article = buildTestArticle("1", "A", false);
-        Article article2 = buildTestArticle("2", "B", false);
-
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
-
-        Collection<Article> articles = repository.findArticlesByCategory("B Category");
-
-        for(Article a : articles){
-            assertEquals("B Category", a.getCategory());
-        }
-    }
-
-    @Test
-    public void findArticlesByUserIds(){
-        Article article = buildTestArticle("1", "Saved", false);
-
-        Article article2 = buildTestArticle("2", "Saved", false);
-
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
-
-        Collection<Article> articles = repository.findArticlesByUserId("1");
-
-        for(Article a : articles){
-            assertEquals("1", a.getUserId());
+            assertEquals("Admin", a.getUserId());
         }
     }
 
     @Test
     public void findArticlesByTitle(){
-        Article article = buildTestArticle("1", "Expected", false);
+        Article article = buildTestArticle("Admin", "1", "FindArticlesByTitleA", false);
+        Article article2 = buildTestArticle("Other", "2", "FindArticlesByTitleB", false);
 
-        Article article2 = buildTestArticle("2", "Other", false);
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
 
-        repository.saveArticle(article);
-        repository.saveArticle(article2);
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
 
-        Collection<Article> articles = repository.findArticlesByTitle("Expected");
+        Collection<Article> articles = repository.findArticlesByTitle("FindArticlesByTitleB");
 
+        assertFalse(articles.isEmpty());
         for(Article a : articles){
-            assertTrue(a.getTitle().contains("Expected"));
+            assertEquals("FindArticlesByTitleB Title", a.getTitle());
         }
     }
 
     @Test
-    public void deleteArticle(){
-        Article article = buildTestArticle("1", "Deleted", false);
+    public void findArticlesByTag(){
+        Article article = buildTestArticle("Admin", "1", "FindArticlesByTagA", false);
+        Article article2 = buildTestArticle("Other", "2", "FindArticlesByTagB", false);
 
-        repository.saveArticle(article);
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
 
-        repository.delete("1");
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
 
-        Article deletedArticle = repository.findDeletedArticleById("1");
-        assertEquals("Deleted Title", deletedArticle.getTitle());
-        assertEquals("Deleted Content", deletedArticle.getContent());
-        assertEquals("Deleted Tag", deletedArticle.getTag());
-        assertEquals("Deleted Category", deletedArticle.getCategory());
-        assertTrue(deletedArticle.getDeleted());
+        Collection<Article> articles = repository.findArticlesByTag("FindArticlesByTagB");
+
+        assertFalse(articles.isEmpty());
+        for(Article a : articles){
+            assertEquals("FindArticlesByTagB Tag", a.getTag());
+        }
     }
 
     @Test
-    public void recoverArticle(){
-        Article article = buildTestArticle("1", "Recovered", false);
+    public void findArticlesByCategory(){
+        Article article = buildTestArticle("Admin", "1", "FindArticlesByCategoryA", false);
+        Article article2 = buildTestArticle("Other", "2", "FindArticlesByCategoryB", false);
 
-        repository.saveArticle(article);
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
 
-        repository.delete("1");
-        Article deletedArticle = repository.findDeletedArticleById("1");
-        assertEquals(true, deletedArticle.getDeleted());
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
 
-        repository.recover("1");
-        Article recoveredArticle = repository.findArticleById("1");
-        assertEquals("Recovered Title", deletedArticle.getTitle());
-        assertEquals("Recovered Content", deletedArticle.getContent());
-        assertEquals("Recovered Tag", deletedArticle.getTag());
-        assertEquals("Recovered Category", deletedArticle.getCategory());
-        assertFalse(recoveredArticle.getDeleted());
+        Collection<Article> articles = repository.findArticlesByCategory("FindArticlesByCategoryB");
+
+        assertFalse(articles.isEmpty());
+        for(Article a : articles){
+            assertEquals("FindArticlesByCategoryB Category", a.getCategory());
+        }
     }
 
-    private Article buildTestArticle(String id, String action, boolean deleted) {
-        Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
+    @Test
+    public void findArticlesByUserIds(){
+        Article article = buildTestArticle("Admin", "1", "FindArticlesByCategoryA", false);
+        Article article2 = buildTestArticle("Other", "2", "FindArticlesByCategoryB", false);
+
+        User user = new User("Admin", "Admin", "Admin");
+        user.addArticle(article);
+        repository.saveUser(user);
+
+        User user2 = new User("Other", "Other", "Other");
+        user2.addArticle(article2);
+        repository.saveUser(user2);
+
+        Collection<Article> articles = repository.findArticlesByUserId("Admin");
+
+        assertFalse(articles.isEmpty());
+        for(Article a : articles){
+            assertEquals("Admin", a.getUserId());
+        }
+    }
+
+    private Article buildTestArticle(String userId, String articleId, String action, boolean deleted) {
+        Instant fixedTime = Instant.parse("2025-06-07T00:00:00Z");
         Article article = new Article();
-        article.setUserId(id);
-        article.setArticleId(id);
+        article.setUserId(userId);
+        article.setArticleId(articleId);
         article.setTitle(action + " Title");
         article.setContent(action + " Content");
         article.setTag(action + " Tag");

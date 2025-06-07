@@ -37,24 +37,124 @@ public class ArticleController {
     UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity<String> create(@RequestBody String info){
+    public ResponseEntity<String> createArticle(@RequestBody String info, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+
         JSONObject jsonObject = new JSONObject(info);
-        String articleId = UUID.randomUUID().toString();
-        String userId = jsonObject.getString("userId");
         String title = jsonObject.getString("title");
         String content = jsonObject.getString("content");
         String tag = jsonObject.getString("tag");
         String category = jsonObject.getString("category");
-        Instant date = Instant.parse(jsonObject.getString("date"));
+        String dateStr = jsonObject.getString("date");
 
         if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
+            return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
         }
 
-        articleId = articleService.create(userId, articleId, title, content, tag, category, date);
+        Instant date;
+        try {
+            date = Instant.parse(dateStr);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid date format.");
+        }
 
-        if(articleId != null){
-            return ResponseEntity.ok().body(articleId);
+        String articleId = UUID.randomUUID().toString();
+
+        String resultId = articleService.create(userId, articleId, title, content, tag, category, date);
+
+        if(resultId != null){
+            return ResponseEntity.ok().body(resultId);
+        }
+        else{
+            return ResponseEntity.internalServerError().body("Failed to create article.");
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Collection<Article>> getArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getArticlesByUserId(userId);
+
+        return ResponseEntity.ok().body(articles);
+    }
+
+    @GetMapping("/{articleId}")
+    public ResponseEntity<Article> getArticle(@PathVariable String articleId){
+
+        Article article = articleService.getArticle(articleId);
+
+        if(article != null){
+            return ResponseEntity.ok().body(article);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{articleId}")
+    public ResponseEntity<String> updateArticle(@RequestBody String info, @PathVariable String articleId, HttpSession session){
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+
+        JSONObject jsonObject = new JSONObject(info);
+
+        String title = jsonObject.getString("title");
+        String content = jsonObject.getString("content");
+        String tag = jsonObject.getString("tag");
+        String category = jsonObject.getString("category");
+
+        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
+            return ResponseEntity.badRequest().body("Title, Category, and Content cannot be Empty.");
+        }
+
+        Boolean message = articleService.update(userId, articleId, title, content, tag, category);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> deleteArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId, HttpSession session){
+        String loggedInUserId  = (String) session.getAttribute("userId");
+        if (loggedInUserId == null || !loggedInUserId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
+        boolean message = articleService.delete(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/all/deleted/{userId}")
+    public ResponseEntity<Collection<Article>> getAllDeletedArticlesByUserId(@PathVariable String userId){
+        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
+
+        if(articles != null){
+            return ResponseEntity.ok().body(articles);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{userId}/{articleId}")
+    public ResponseEntity<String> recoverArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+        boolean message = articleService.recover(userId, articleId);
+
+        if(message){
+            return ResponseEntity.ok().build();
         }
         else{
             return ResponseEntity.internalServerError().build();
@@ -102,18 +202,6 @@ public class ArticleController {
         return ResponseEntity.ok(articles);
     }
 
-    @GetMapping("/all/deleted/{userId}")
-    public ResponseEntity<Collection<Article>> getAllDeletedArticlesByUserId(@PathVariable String userId){
-        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
-
-        if(articles != null){
-            return ResponseEntity.ok().body(articles);
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @GetMapping("/tag/{tag}")
     public ResponseEntity<Collection<Article>> getArticlesByTag(@PathVariable String tag){
         Collection<Article> articles = articleService.getArticlesByTag(tag);
@@ -138,78 +226,11 @@ public class ArticleController {
         }
     }
 
-    @GetMapping("/{articleId}")
-    public ResponseEntity<Article> getArticle(@PathVariable String articleId){
-        Article article = articleService.getArticle(articleId);
-
-        if(article != null){
-            return ResponseEntity.ok().body(article);
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<Collection<Article>> getArticlesByUserId(@PathVariable String userId){
-        Collection<Article> articles = articleService.getArticlesByUserId(userId);
-
-        return ResponseEntity.ok().body(articles);
-    }
-
     @GetMapping("/title/{keyword}")
     public ResponseEntity<Collection<Article>> getArticlesByTitle(@PathVariable String keyword){
         Collection<Article> articles = articleService.getArticlesByTitle(keyword);
 
         return ResponseEntity.ok().body(articles);
-    }
-
-    @PutMapping("/{articleId}")
-    public ResponseEntity<String> update(@RequestBody String info, @PathVariable String articleId){
-
-        JSONObject jsonObject = new JSONObject(info);
-
-        String title = jsonObject.getString("title");
-        String content = jsonObject.getString("content");
-        String tag = jsonObject.getString("tag");
-        String category = jsonObject.getString("category");
-
-        if(title.isEmpty() || category.isEmpty() || content.isEmpty()){
-            return ResponseEntity.internalServerError().body("Title, Category, and Content cannot Empty.");
-        }
-
-        Boolean message = articleService.update(articleId, title, content, tag, category);
-
-        if(message){
-            return ResponseEntity.ok().build();
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @DeleteMapping("/{userId}/{articleId}")
-    public ResponseEntity<String> delete(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = articleService.delete(userId, articleId);
-
-        if(message){
-            return ResponseEntity.ok().build();
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PutMapping("/{userId}/{articleId}")
-    public ResponseEntity<String> recover(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = articleService.recover(userId, articleId);
-
-        if(message){
-            return ResponseEntity.ok().build();
-        }
-        else{
-            return ResponseEntity.internalServerError().build();
-        }
     }
 
     @PutMapping("/bookmark/{bookmarkId}/{articleId}")

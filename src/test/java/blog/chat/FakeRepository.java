@@ -1,6 +1,6 @@
-package blog.article;
+package blog.chat;
 
-import blog.chat.Chat;
+import blog.article.*;
 import blog.notification.entity.Notification;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
@@ -12,13 +12,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class Repository {
+public class FakeRepository extends Repository {
 
     private final Map<String, Article> articleList = new HashMap<>();
     private final Map<String, Article> deletedArticleList = new HashMap<>();
     private final Map<String, User> userList = new HashMap<>();
-    private final Map<String, Comment> commentList = new HashMap<>();
-    private final Map<String, Reaction> reactionList = new HashMap<>();
+    private final Map<String, Comment> CommentList = new HashMap<>();
+    private final Map<String, Reaction> ReactionList = new HashMap<>();
     private final Map<String, Notification> notificationList = new HashMap<>();
     private final Map<String, Bookmark> bookmarkList = new HashMap<>();
     private final Map<String, Category> categoryList = new HashMap<>();
@@ -26,141 +26,123 @@ public class Repository {
 
     public void clear(){
         articleList.clear();
-        commentList.clear();
         deletedArticleList.clear();
     }
 
     public Collection<Article> findAllArticles(){
-        List<Article> allArticles = new ArrayList<>();
-        for (User user : userList.values()) {
-            if (user.getArticleList() != null) {
-                allArticles.addAll(user.getArticleList());
-            }
-        }
-        return allArticles;
+        return articleList.values();
     }
 
     public Collection<Article> findAllDeletedArticlesByUserId(String userId){
-        User user = userList.get(userId);
-        return user.getDeletedArticleList();
+        Collection<Article> articles = deletedArticleList.values();
+        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
+        return articles;
     }
 
     public Article findArticleById(String articleId){
-        for (User user : userList.values()) {
-            if (user.getArticleList() != null){
-                Collection<Article> articles = user.getArticleList();
-                if(!articles.isEmpty()){
-                    Optional<Article> result = articles.stream().filter(article -> article.getArticleId().equals(articleId)).findFirst();
-                    if (result.isPresent()) {
-                        return result.get();
-                    }
-                }
-            }
-        }
-        return null;
+        return articleList.get(articleId);
     }
 
     public Collection<Article> findArticlesByUserId(String userId){
-        User user = userList.get(userId);
-        return user.getArticleList();
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> userId.equals(article.getUserId())).toList();
+        return articles;
     }
 
     public Collection<Article> findArticlesByTitle(String keyword){
-        List<Article> allArticles = new ArrayList<>();
-        for (User user : userList.values()) {
-            if (user.getArticleList() != null){
-                Collection<Article> articles = user.getArticleList();
-                articles = articles.stream().filter(article -> article.getTag().contains(keyword)).toList();
-                allArticles.addAll(articles);
-            }
-        }
-        return allArticles;
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getTitle().contains(keyword)).toList();
+        return articles;
     }
 
     public Collection<Article> findArticlesByTag(String tag){
-        List<Article> allArticles = new ArrayList<>();
-        for (User user : userList.values()) {
-            if (user.getArticleList() != null){
-                Collection<Article> articles = user.getArticleList();
-                articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
-                allArticles.addAll(articles);
-            }
-        }
-        return allArticles;
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
+        return articles;
     }
 
     public Collection<Article> findArticlesByCategory(String category){
-        List<Article> allArticles = new ArrayList<>();
-        for (User user : userList.values()) {
-            if (user.getArticleList() != null){
-                Collection<Article> articles = user.getArticleList();
-                articles = articles.stream().filter(article -> article.getTag().contains(category)).toList();
-                allArticles.addAll(articles);
-            }
-        }
-        return allArticles;
+        Collection<Article> articles = articleList.values();
+        articles = articles.stream().filter(article -> article.getCategory().equals(category)).toList();
+        return articles;
     }
 
     public void saveArticle(Article article) {
         articleList.put(article.getArticleId(), article);
     }
 
-    // Comment
-    public void clearFeedback(){
-        commentList.clear();
-        reactionList.clear();
+    public Article findDeletedArticleById(String articleId){
+        return deletedArticleList.get(articleId);
     }
 
+    public void delete(String articleId) {
+        Article article = articleList.get(articleId);
+        article.delete();
+        articleList.remove(articleId);
+
+        deletedArticleList.put(articleId, article);
+    }
+
+    public void recover(String articleId){
+        Article article = deletedArticleList.get(articleId);
+        article.recover();
+        deletedArticleList.remove(articleId);
+
+        articleList.put(articleId, article);
+    }
+
+    // Comment
+
     public Comment findCommentById(String commentId){
-        return commentList.get(commentId);
+        return CommentList.get(commentId);
     }
 
     public List<Comment> findCommentsByArticleId(String articleId){
-        return commentList.values().stream()
+        return CommentList.values().stream()
                 .filter(comment -> comment.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Comment> findAllComments(){
-        return commentList.values().stream().toList();
+        return CommentList.values().stream().toList();
     }
 
     public void saveComment(Comment comment) {
-        commentList.put(comment.getId(), comment);
+        CommentList.put(comment.getId(), comment);
     }
 
     public void deleteComment(String commentId) {
-        commentList.remove(commentId);
+        CommentList.remove(commentId);
     }
 
     // Reaction
 
     public List<Reaction> findReactionsByArticleId(String articleId){
-        return reactionList.values().stream()
+        return ReactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId))
                 .toList();
     }
 
     public List<Reaction> findReactionsByCommentId(String articleId, String commentId){
-        return reactionList.values().stream()
+        return ReactionList.values().stream()
                 .filter(reaction -> reaction.getArticleId().equals(articleId) && reaction.getCommentId().equals(commentId))
                 .toList();
     }
 
     public Reaction findReactionById(String reactionId){
-        return reactionList.get(reactionId);
+        return ReactionList.get(reactionId);
     }
 
     public List<Reaction> findAllReactions(){
-        return reactionList.values().stream().toList();
+        return ReactionList.values().stream().toList();
     }
 
     public void saveReaction(Reaction reaction) {
-        reactionList.put(reaction.getId(), reaction);
+        ReactionList.put(reaction.getId(), reaction);
     }
 
     public void deleteReaction(String reactionId) {
-        reactionList.remove(reactionId);
+        ReactionList.remove(reactionId);
     }
 
     // User
@@ -173,24 +155,10 @@ public class Repository {
         userList.put(user.getUserId(), user);
     }
 
-    public Map<String, String> findUsernamesByUserId(List<String> userIds) {
-        Map<String, String> result = new HashMap<>();
-        for (String id : userIds) {
-            if (userList.containsKey(id)) {
-                result.put(id, userList.get(id).getUsername());
-            }
-        }
-        return result;
-    }
-
     public User findUserById(String userId) {
         return userList.get(userId);
     }
 
-    public void deleteUser(String userId) {
-        userList.remove(userId);
-    }
-     
     public Notification findNotificationById(String id) {
         return notificationList.get(id);
     }
@@ -210,17 +178,11 @@ public class Repository {
     }
 
     public void saveBookmark(Bookmark bookmark) {
-        bookmarkList.put(bookmark.getBookmarkId(), bookmark);
+        bookmarkList.put(bookmark.getUserId(), bookmark);
     }
 
-    public List<Bookmark> findBookmarksByUserId(String userId){
-        return bookmarkList.values().stream()
-                .filter(bookmark -> bookmark.getUserId().equals(userId))
-                .toList();
-    }
-
-    public Bookmark findBookmarkByBookmarkId(String bookmarkId){
-        return bookmarkList.get(bookmarkId);
+    public Bookmark findBookmarkByUserId(String userId){
+        return bookmarkList.get(userId);
     }
 
     @PostConstruct
@@ -266,7 +228,6 @@ public class Repository {
                         chat -> chat
                 ));
     }
-
 
     public boolean findChatsByUsers(String user1Id, String user2Id) {
         for (Chat chat : chatList.values()) {

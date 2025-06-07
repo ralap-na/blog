@@ -1,5 +1,6 @@
 package blog.feedback.service;
 
+import blog.article.Article;
 import blog.article.Repository;
 import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
@@ -39,12 +40,35 @@ public class FeedbackService {
             return OperationOutcome.create().setId(commentId).setMessage("Comment not found.").setState(OutcomeState.FAILURE);
         }
 
-        if (!comment.getUserId().equals(userId)) {
-            return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+        Article article = repository.findArticleById(comment.getArticleId());
+        if (article == null) {
+            return OperationOutcome.create().setId(commentId).setMessage("Article might be deleted.").setState(OutcomeState.FAILURE);
         }
 
+        if(!comment.getUserId().equals(userId)) {
+            if(!article.getUserId().equals(userId)) {
+                return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+            }
+        }
         repository.deleteComment(commentId);
         return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
+    }
+
+    public OperationOutcome addReaction(String articleId, String commentId, String userId, String type) {
+        if (type == null || type.isEmpty()) {
+            return OperationOutcome.create().setId(articleId).setMessage("Reaction type should not be empty.").setState(OutcomeState.FAILURE);
+        }
+
+        String reactionId = UUID.randomUUID().toString();
+        Reaction reaction = new Reaction(reactionId, userId, articleId, commentId, type);
+        Comment comment = repository.findCommentById(commentId);
+        if (comment == null) {
+            return OperationOutcome.create().setId(commentId).setMessage("Comment not found.").setState(OutcomeState.FAILURE);
+        }
+        comment.addReaction(reaction);
+        repository.saveComment(comment);
+        repository.saveReaction(reaction);
+        return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
     }
 
     public List<Comment> getCommentsByArticleId(String articleId) {
@@ -66,13 +90,6 @@ public class FeedbackService {
         return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
     }
 
-    public OperationOutcome addReactionOnComment(String articleId, String commentId, String userId, String type) {
-        String reactionId = UUID.randomUUID().toString();
-        Reaction reaction = new Reaction(reactionId, userId, articleId, commentId, type);
-        repository.saveReaction(reaction);
-        return OperationOutcome.create().setId(reactionId).setState(OutcomeState.SUCCESS);
-    }
-
     public OperationOutcome removeReaction(String reactionId, String userId) {
         Reaction reaction = repository.findReactionById(reactionId);
 
@@ -82,6 +99,14 @@ public class FeedbackService {
 
         if (!userId.equals(reaction.getUserId())) {
             return OperationOutcome.create().setId(reactionId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
+        }
+
+        if (reaction.getCommentId() != null) {
+            Comment comment = repository.findCommentById(reaction.getCommentId());
+            if (comment != null) {
+                comment.removeReaction(reaction);
+                repository.saveComment(comment);
+            }
         }
 
         repository.deleteReaction(reactionId);

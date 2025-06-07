@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -102,5 +105,10 @@ public class UserController {
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
+    }
+
+    @GetMapping
+    public Map<String, String> findUsersByIds(@RequestParam List<String> ids) {
+        return userService.getUsernames(ids);
     }
 }
