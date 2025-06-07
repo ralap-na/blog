@@ -52,8 +52,6 @@ class ArticleControllerTest {
         user.addArticle(article1);
         user.addArticle(article2);
 
-        repository.saveArticle(article1);
-        repository.saveArticle(article2);
         repository.saveUser(user);
     }
 

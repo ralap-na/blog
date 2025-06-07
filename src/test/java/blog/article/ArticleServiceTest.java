@@ -46,7 +46,6 @@ public class ArticleServiceTest {
         article.setDate(fixedTime);
         article.setDeleted(false);
         user.addArticle(article);
-        repository.saveArticle(article);
         repository.saveUser(user);
 
         userService.createUser("Tester", "Tester");
@@ -139,8 +138,6 @@ public class ArticleServiceTest {
 
     @Test
     public void getArticlesByUserId(){
-        repository.saveArticle(new Article(userId, "2", "Original Title", "Original Content", "Original Tag", "Original Category", fixedTime, false));
-
         Collection<Article> articles = articleService.getArticlesByUserId(userId);
         for(Article a : articles){
             assertEquals(userId, a.getUserId());
