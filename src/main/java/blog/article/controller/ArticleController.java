@@ -122,7 +122,11 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{userId}/{articleId}")
-    public ResponseEntity<String> deleteArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
+    public ResponseEntity<String> deleteArticle(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId, HttpSession session){
+        String loggedInUserId  = (String) session.getAttribute("userId");
+        if (loggedInUserId == null || !loggedInUserId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in.");
+        }
         boolean message = articleService.delete(userId, articleId);
 
         if(message){

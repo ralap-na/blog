@@ -2,6 +2,8 @@ package blog.article;
 
 import blog.article.service.ArticleService;
 import blog.user.User;
+import blog.user.service.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,15 @@ public class ArticleServiceTest {
     private ArticleService articleService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private Repository repository;
 
     private Instant fixedTime = Instant.parse("2024-01-01T00:00:00Z");
     private String userId;
+    private String testerId;
+
 
     @BeforeEach
     void setUp() {
@@ -41,6 +48,18 @@ public class ArticleServiceTest {
         user.addArticle(article);
         repository.saveArticle(article);
         repository.saveUser(user);
+
+        userService.createUser("Tester", "Tester");
+
+        testerId = repository.findUserByUsername("Tester").get().getUserId();
+
+    }
+
+    @AfterEach
+    void tearDown(){
+        repository.clear();
+        repository.deleteUser(testerId);
+        repository.findUserByUsername("Admin").get().clear();
     }
 
     @Test
@@ -58,7 +77,10 @@ public class ArticleServiceTest {
 
     @Test
     public void getAllArticles(){
-        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+        User user = repository.findUserByUsername("Admin").get();
+        Article article = new Article(testerId, "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false);
+        user.addArticle(article);
+        repository.saveUser(user);
 
         Collection<Article> articles = articleService.getAllArticles();
 
@@ -67,26 +89,32 @@ public class ArticleServiceTest {
 
     @Test
     public void getAllDeletedArticlesByUserId(){
-        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
+        User admin = repository.findUserByUsername("Admin").get();
+        User tester = repository.findUserByUsername("Tester").get();
+        Article article = new Article(testerId, "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false);
+        tester.addArticle(article);
+        repository.saveUser(tester);
 
-        repository.delete("1");
-        repository.delete("2");
+        admin.deleteArticle("1");
+        tester.deleteArticle("2");
 
-        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId("2");
+        Collection<Article> articles = articleService.getAllDeletedArticlesByUserId(userId);
 
         assertEquals(1, articles.size());
     }
 
     @Test
     public void getArticlesByConditions(){
-        repository.saveArticle(new Article("2", "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false));
-
+        Article article = new Article(testerId, "2", "Other Title", "Other Content", "Other Tag", "Other Category", fixedTime, false);
+        User admin = repository.findUserByUsername("Admin").get();
+        admin.addArticle(article);
+        repository.saveUser(admin);
 
         Collection<Article> articles = articleService.getArticlesByConditions("Other Title", "Other Category", "Other Tag");
 
         assertEquals(1, articles.size());
 
-        Article article = articles.stream().toList().get(0);
+        article = articles.stream().toList().get(0);
         assertEquals("Other Title", article.getTitle());
         assertEquals("Other Tag", article.getTag());
         assertEquals("Other Category", article.getCategory());

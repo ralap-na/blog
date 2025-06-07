@@ -60,6 +60,7 @@ class ArticleControllerTest {
     @AfterEach
     public void tearDown(){
         repository.clear();
+        repository.findUserByUsername("Admin").get().clear();
     }
 
     @Test
@@ -270,7 +271,8 @@ class ArticleControllerTest {
 
     @Test
     public void getAllDeletedArticlesByUserId(){
-        repository.delete("1");
+        User user = repository.findUserByUsername("Admin").get();
+        user.deleteArticle("1");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -404,8 +406,13 @@ class ArticleControllerTest {
     public void deleteArticle(){
         String articleId = "1";
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -422,8 +429,8 @@ class ArticleControllerTest {
     @Test
     public void recoverArticle(){
         String articleId = "1";
-
-        repository.delete(articleId);
+        User user = repository.findUserById(userId);
+        user.deleteArticle(articleId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
