@@ -126,7 +126,7 @@ public class User {
         }
         return false; // 沒有找到符合的文章
     }
-
+  
     public String getUserId() {
         return userId;
     }

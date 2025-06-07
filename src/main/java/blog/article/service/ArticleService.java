@@ -60,7 +60,9 @@ public class ArticleService {
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
+
         repository.saveUser(user);
+
         return true;
     }
 

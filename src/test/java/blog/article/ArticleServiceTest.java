@@ -30,6 +30,7 @@ public class ArticleServiceTest {
     private String userId;
     private String testerId;
 
+
     @BeforeEach
     void setUp() {
         repository.clear();
