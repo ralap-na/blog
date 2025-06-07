@@ -2,6 +2,8 @@ package blog.article.service;
 
 import blog.article.Article;
 import blog.article.Repository;
+import blog.user.User;
+import blog.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,17 @@ public class ArticleService {
     @Autowired
     private Repository repository;
 
+    @Autowired
+    private UserService userService;
+
     public String create(String userId, String articleId, String title, String content, String tag, String category, Instant date) {
         Article article = new Article(userId, articleId, title, content, tag, category, date, false);
+        User user = userService.getUser(userId);
 
-        repository.saveArticle(article);
+        articleId = user.addArticle(article);
+        repository.saveUser(user);
 
-        article = repository.findArticleById(articleId);
+        article = user.findArticleById(articleId);
 
         if(article == null){
             return null;
@@ -32,8 +39,9 @@ public class ArticleService {
     }
 
     public Collection<Article> getArticlesByUserId(String userId){
+        User user = userService.getUser(userId);
 
-        return repository.findArticlesByUserId(userId);
+        return user.getArticleList();
     }
 
     public Article getArticle(String articleId) {
@@ -45,29 +53,33 @@ public class ArticleService {
         return article;
     }
 
-    public Boolean update(String articleId, String title, String content, String tag, String category){
-        Article article = repository.findArticleById(articleId);
+    public Boolean update(String userId, String articleId, String title, String content, String tag, String category){
+        User user = repository.findUserById(userId);
+        Article article = user.updateArticle(articleId, title, content, tag, category);
 
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
-        article.update(title, content, tag, category);
-        repository.saveArticle(article);
+
+        repository.saveUser(user);
+
         return true;
     }
 
     public boolean delete(String userId, String articleId){
-        Article article = repository.findArticleById(articleId);
+        User user = userService.getUser(userId);
+        Article article = user.findArticleById(articleId);
 
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
 
         if(userId.equals(article.getUserId())){
-            repository.delete(articleId);
+            user.deleteArticle(articleId);
+            repository.saveUser(user);
         }
 
-        if(repository.findArticleById(articleId) == null && repository.findDeletedArticleById(articleId) != null){
+        if(user.findArticleById(articleId) == null && user.findDeletedArticleById(articleId) != null){
             return true;
         }
 
@@ -75,7 +87,8 @@ public class ArticleService {
     }
 
     public Collection<Article> getAllDeletedArticlesByUserId(String userId) {
-        Collection<Article> articles = repository.findAllDeletedArticlesByUserId(userId);
+        User user = userService.getUser(userId);
+        Collection<Article> articles = user.getDeletedArticleList();
         if(articles == null){
             return null;
         }
@@ -84,17 +97,19 @@ public class ArticleService {
     }
 
     public boolean recover(String userId, String articleId){
-        Article article = repository.findDeletedArticleById(articleId);
+        User user = userService.getUser(userId);
+        Article article = user.findDeletedArticleById(articleId);
 
         if (article == null) {
             return false; // 文章不存在，返回 false
         }
 
         if(userId.equals(article.getUserId())){
-            repository.recover(articleId);
+            user.recoverArticle(articleId);
+            repository.saveUser(user);
         }
 
-        if(repository.findArticleById(articleId) != null && repository.findDeletedArticleById(articleId) == null){
+        if(user.findArticleById(articleId) != null && user.findDeletedArticleById(articleId) == null){
             return true;
         }
 
@@ -111,36 +126,34 @@ public class ArticleService {
     }
 
     public Collection<Article> getArticlesByConditions(String title, String category, String tag) {
+        Collection<Article> articles = repository.findAllArticles();
+
         List<Collection<Article>> filters = new ArrayList<>();
 
         if (tag != null && !tag.isEmpty()) {
-            Collection<Article> tagArticles = repository.findArticlesByTag(tag);
-            if (tagArticles == null) return null;
-            filters.add(tagArticles);
+            articles = articles.stream().filter(article -> article.getTag().contains(tag)).toList();
+
+            if (articles == null) return null;
+
         }
 
         if (category != null && !category.isEmpty()) {
-            Collection<Article> categoryArticles = repository.findArticlesByCategory(category);
-            if (categoryArticles == null) return null;
-            filters.add(categoryArticles);
+            articles = articles.stream().filter(article -> article.getCategory().contains(category)).toList();
+
+            if (articles == null) return null;
         }
 
         if (title != null && !title.isEmpty()) {
-            Collection<Article> titleArticles = repository.findArticlesByTitle(title);
-            if (titleArticles == null) return null;
-            filters.add(titleArticles);
+            articles = articles.stream().filter(article -> article.getTitle().contains(title)).toList();
+
+            if (articles == null) return null;
         }
 
-        if (filters.isEmpty()) {
+        if (articles.isEmpty()) {
             return null;
         }
 
-        Collection<Article> result = new ArrayList<>(filters.get(0));
-        for (int i = 1; i < filters.size(); i++) {
-            result.retainAll(filters.get(i));
-        }
-
-        return result;
+        return articles;
     }
 
 

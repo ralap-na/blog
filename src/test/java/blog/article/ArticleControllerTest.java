@@ -1,8 +1,10 @@
 package blog.article;
 
+import blog.article.service.ArticleService;
 import blog.user.User;
 import net.minidev.json.JSONObject;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// RANDOM_PORT 會自動分配測試端口
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ArticleControllerTest {
 
@@ -28,34 +31,53 @@ class ArticleControllerTest {
 
     @Autowired
     private Repository repository; // 注入 Repository 以準備測試數據
+    @Autowired
+    private ArticleService articleService;
 
     private String baseUrl;
+    private String userId;
 
     @BeforeEach
     public void setUp() {
-        // 設定基礎 URL，RANDOM_PORT 會自動分配測試端口
+        // 設定基礎 URL，
         baseUrl = "/article";
 
         repository.clear();
-        repository.saveArticle(new Article("1", "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false));
-        repository.saveArticle(new Article("1", "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false));
+        userId = repository.findUserByUsername("Admin").get().getUserId();
+
+        Article article1 = new Article(userId, "1", "Original Title", "Original Content", "Original Tag", "Original Category", Instant.now(), false);
+        Article article2 = new Article(userId, "2", "Expected Title", "Expected Content", "Expected Tag", "Expected Category", Instant.now(), false);
+
+        User user = repository.findUserByUsername("Admin").get();
+        user.addArticle(article1);
+        user.addArticle(article2);
+
+        repository.saveUser(user);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        repository.clear();
+        repository.findUserByUsername("Admin").get().clear();
     }
 
     @Test
     public void createArticleSuccess() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
-        requestBody.put("userId", "1");
-        requestBody.put("articleId", "3");
         requestBody.put("title", "Created Title");
         requestBody.put("content", "Created Content");
         requestBody.put("tag", "Created tag");
         requestBody.put("category", "Created category");
         requestBody.put("date", "2025-04-12T15:30:24.517Z");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 POST request
@@ -68,21 +90,28 @@ class ArticleControllerTest {
 
         // 檢查reponse status code 是否是 200 OK
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        String articleId = response.getBody();
+        assertNotNull(articleId);
+        assertDoesNotThrow(() -> UUID.fromString(articleId)); // 確保是合法 UUID
+
+        User user = repository.findUserByUsername("Admin").get();
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById(response.getBody());
-        assertEquals("1", updatedArticle.getUserId());
-        assertEquals("Created Title", updatedArticle.getTitle());
-        assertEquals("Created Content", updatedArticle.getContent());
-        assertEquals("Created tag", updatedArticle.getTag());
-        assertEquals("Created category", updatedArticle.getCategory());
+        Article createdArticle = user.findArticleById(response.getBody());
+        assertEquals(user.getUserId(), createdArticle.getUserId());
+        assertEquals("Created Title", createdArticle.getTitle());
+        assertEquals("Created Content", createdArticle.getContent());
+        assertEquals("Created tag", createdArticle.getTag());
+        assertEquals("Created category", createdArticle.getCategory());
+
+        // Teardown
+        user.clear();
     }
 
     @Test
     public void createArticleFail() {
         // 準備測試文章
         JSONObject requestBody = new JSONObject();
-        requestBody.put("userId", "1");
         requestBody.put("articleId", "3");
         requestBody.put("title", "");
         requestBody.put("content", "Created Content");
@@ -90,9 +119,13 @@ class ArticleControllerTest {
         requestBody.put("category", "Created category");
         requestBody.put("date", "2025-04-12T15:30:24.517Z");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 POST request
@@ -104,8 +137,8 @@ class ArticleControllerTest {
         );
 
         // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot be Empty.", response.getBody());
     }
 
     @Test
@@ -132,7 +165,7 @@ class ArticleControllerTest {
         org.json.JSONObject jsonObject = new org.json.JSONObject(response.getBody());
 
         assertEquals("1", jsonObject.getString("articleId"));
-        assertEquals("1", jsonObject.getString("userId"));
+        assertEquals(userId, jsonObject.getString("userId"));
         assertEquals("Original Title", jsonObject.getString("title"));
         assertEquals("Original Content", jsonObject.getString("content"));
         assertEquals("Original Tag", jsonObject.getString("tag"));
@@ -141,7 +174,6 @@ class ArticleControllerTest {
 
     @Test
     public void getArticlesByUserId(){
-        String userId = "1";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -167,7 +199,7 @@ class ArticleControllerTest {
 
         // 驗證文章 userId 為 "1"
         for (Article article : articles) {
-            assertEquals(userId, article.getUserId(), "Each article should belong to userId = 1");
+            assertEquals(userId, article.getUserId(), "Each article should belong to userId = " + userId);
         }
 
     }
@@ -237,9 +269,8 @@ class ArticleControllerTest {
 
     @Test
     public void getAllDeletedArticlesByUserId(){
-        repository.delete("1");
-
-        String userId = "1";
+        User user = repository.findUserByUsername("Admin").get();
+        user.deleteArticle("1");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -277,9 +308,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "Updated Tag");
         requestBody.put("category", "Updated Category");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -294,7 +329,8 @@ class ArticleControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         // 驗證 Repository 中的資料是否更新
-        Article updatedArticle = repository.findArticleById(articleId);
+        User user = repository.findUserById(userId);
+        Article updatedArticle = user.findArticleById(articleId);
         assertEquals("Updated Title", updatedArticle.getTitle());
         assertEquals("Updated Content", updatedArticle.getContent());
         assertEquals("Updated Tag", updatedArticle.getTag());
@@ -311,9 +347,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "invalid");
         requestBody.put("category", "invalid");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -338,9 +378,13 @@ class ArticleControllerTest {
         requestBody.put("tag", "invalid");
         requestBody.put("category", "");
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
         // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(requestBody.toString(), headers);
 
         // 發送 PUT request
@@ -352,17 +396,21 @@ class ArticleControllerTest {
         );
 
         // 檢查reponse status code 是否是 500 INTERNAL_SERVER_ERROR
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Title, Category, and Content cannot Empty.", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Title, Category, and Content cannot be Empty.", response.getBody());
     }
 
     @Test
     public void deleteArticle(){
-        String userId = "1";
         String articleId = "1";
 
+        // 先登入取得 cookie
+        String cookie = loginAsAdminAndGetCookie();
+
+        // 設定Header
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookie);
         HttpEntity<String> request = new HttpEntity<>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
@@ -378,10 +426,9 @@ class ArticleControllerTest {
 
     @Test
     public void recoverArticle(){
-        String userId = "1";
         String articleId = "1";
-
-        repository.delete(articleId);
+        User user = repository.findUserById(userId);
+        user.deleteArticle(articleId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
