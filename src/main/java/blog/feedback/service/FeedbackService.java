@@ -6,6 +6,8 @@ import blog.common.OperationOutcome;
 import blog.common.OutcomeState;
 import blog.feedback.Comment;
 import blog.feedback.Reaction;
+import blog.user.User;
+import blog.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.UUID;
 public class FeedbackService {
     @Autowired
     private final Repository repository;
+    @Autowired
+    private UserService userService;
 
     public FeedbackService(Repository repository) {
         this.repository = repository;
@@ -29,12 +33,15 @@ public class FeedbackService {
 
         String commentId = UUID.randomUUID().toString();
         Comment comment = new Comment(commentId, articleId, userId, content, date);
-        repository.saveComment(comment);
+        User user = userService.getUser(userId);
+        user.addComment(comment);
+        repository.saveUser(user);
         return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
     }
 
     public OperationOutcome deleteComment(String commentId, String userId) {
         Comment comment = repository.findCommentById(commentId);
+        User user = userService.getUser(userId);
 
         if (comment == null) {
             return OperationOutcome.create().setId(commentId).setMessage("Comment not found.").setState(OutcomeState.FAILURE);
@@ -50,7 +57,8 @@ public class FeedbackService {
                 return OperationOutcome.create().setId(commentId).setMessage("Invalid user.").setState(OutcomeState.FAILURE);
             }
         }
-        repository.deleteComment(commentId);
+        user.deleteComment(commentId);
+        repository.saveUser(user);
         return OperationOutcome.create().setId(commentId).setState(OutcomeState.SUCCESS);
     }
 
