@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,18 +166,6 @@ public class RepositoryTest {
         article.setDate(fixedTime);
         article.setDeleted(deleted);
         return article;
-    }
-
-    @Test
-    public void saveBookmark() {
-        String userId = "u1";
-        Bookmark bookmark = new Bookmark(userId);
-
-        repository.saveBookmark(bookmark);
-
-        Bookmark bookmark1 = repository.findBookmarkByUserId(userId);
-
-        assertEquals(userId, bookmark1.getUserId());
     }
 
     @Test

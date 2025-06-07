@@ -1,7 +1,7 @@
 package blog.article.controller;
 
 import blog.article.Article;
-import blog.article.Repository;
+import blog.article.Bookmark;
 import blog.article.service.BookmarkService;
 import blog.article.service.ArticleService;
 import blog.article.service.CategoryService;
@@ -233,9 +233,9 @@ public class ArticleController {
         return ResponseEntity.ok().body(articles);
     }
 
-    @PutMapping("/bookmark/{userId}/{articleId}")
-    public ResponseEntity<String> addToBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = bookmarkService.addArticle(userId, articleId);
+    @PutMapping("/bookmark/{bookmarkId}/{articleId}")
+    public ResponseEntity<String> addToBookmark(@PathVariable(value="bookmarkId") String bookmarkId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.addArticle(bookmarkId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
@@ -245,9 +245,9 @@ public class ArticleController {
         }
     }
 
-    @DeleteMapping("/bookmark/{userId}/{articleId}")
-    public ResponseEntity<String> deleteFromBookmark(@PathVariable(value="userId") String userId, @PathVariable(value="articleId") String articleId){
-        boolean message = bookmarkService.deleteArticle(userId, articleId);
+    @DeleteMapping("/bookmark/{bookmarkId}/{articleId}")
+    public ResponseEntity<String> deleteFromBookmark(@PathVariable(value="bookmarkId") String bookmarkId, @PathVariable(value="articleId") String articleId){
+        boolean message = bookmarkService.deleteArticle(bookmarkId, articleId);
 
         if(message){
             return ResponseEntity.ok().build();
@@ -257,9 +257,9 @@ public class ArticleController {
         }
     }
 
-    @GetMapping("/bookmark/{userId}")
-    public ResponseEntity<List<String>> getArticleIdsFromBookmarkByUserId(@PathVariable String userId){
-        List<String> articleIds = bookmarkService.getArticleIds(userId);
+    @GetMapping("/bookmark/{bookmarkId}")
+    public ResponseEntity<List<String>> getArticleIdsFromBookmarkByBookmarkId(@PathVariable String bookmarkId){
+        List<String> articleIds = bookmarkService.getArticleIds(bookmarkId);
 
         if(articleIds != null){
             return ResponseEntity.ok().body(articleIds);
@@ -269,6 +269,17 @@ public class ArticleController {
         }
     }
 
+    @GetMapping("/bookmark/user/{userId}")
+    public ResponseEntity<List<Bookmark>> getBookmarksByUserId(@PathVariable String userId){
+        List<Bookmark> bookmarks = bookmarkService.getBookmarks(userId);
+
+        if(bookmarks != null){
+            return ResponseEntity.ok().body(bookmarks);
+        }
+        else{
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @PostMapping("/category/create")
     public ResponseEntity<String> createCategory(@RequestParam String name, HttpSession session) {

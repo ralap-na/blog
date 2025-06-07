@@ -1,7 +1,10 @@
 package blog.article;
 
 import blog.article.service.BookmarkService;
+import blog.user.User;
+import blog.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,23 +18,35 @@ public class BookmarkServiceTest {
 
     @Autowired
     private BookmarkService bookmarkService;
-
+    @Autowired
+    private UserService userService;
     @Autowired
     private Repository repository;
+    private String testerId;
+
+    @BeforeEach
+    void setUp() {
+        userService.createUser("Tester", "Tester");
+        testerId = repository.findUserByUsername("Tester").get().getUserId();
+    }
 
     @AfterEach
     public void tearDown() {
         // 清空 Repository 裡的資料
         repository.clear();
+        repository.deleteUser(testerId);
     }
-
     @Test
     public void addArticle(){
+        Bookmark bookmark = new Bookmark("b1", "Bookmark-1");
+        User user = repository.findUserById(testerId);
+        user.addBookmark(bookmark);
+
         Article article = new Article();
         article.setArticleId("a1");
         article.setUserId("u1");
         repository.saveArticle(article);
-        boolean message = bookmarkService.addArticle("u2", article.getArticleId());
+        boolean message = bookmarkService.addArticle(bookmark.getBookmarkId(), article.getArticleId());
 
         assertTrue(message);
     }
@@ -41,9 +56,13 @@ public class BookmarkServiceTest {
         Article article = new Article();
         article.setArticleId("a1");
         article.setUserId("u1");
+        Bookmark bookmark = new Bookmark("b1", "Bookmark-1");
+        User user = repository.findUserById(testerId);
+        user.addBookmark(bookmark);
+
         repository.saveArticle(article);
-        bookmarkService.addArticle("u2", article.getArticleId());
-        boolean message = bookmarkService.deleteArticle("u2", article.getArticleId());
+        bookmarkService.addArticle("b1", article.getArticleId());
+        boolean message = bookmarkService.deleteArticle("b1", article.getArticleId());
 
         assertTrue(message);
     }
@@ -58,15 +77,38 @@ public class BookmarkServiceTest {
         article2.setArticleId("a2");
         article2.setUserId("u1");
 
+        Bookmark bookmark = new Bookmark("b1", "Bookmark-1");
+        User user = repository.findUserById(testerId);
+        user.addBookmark(bookmark);
+
         repository.saveArticle(article1);
         repository.saveArticle(article2);
-        bookmarkService.addArticle("u2", article1.getArticleId());
-        bookmarkService.addArticle("u2", article2.getArticleId());
+        bookmarkService.addArticle("b1", article1.getArticleId());
+        bookmarkService.addArticle("b1", article2.getArticleId());
 
-        List<String> articleIds = bookmarkService.getArticleIds("u2");
+        List<String> articleIds = bookmarkService.getArticleIds("b1");
 
         assertTrue(articleIds.contains("a1"));
         assertTrue(articleIds.contains("a2"));
         assertEquals(2, articleIds.size());
+    }
+
+    @Test
+    public void getBookmarkIds(){
+        String bookmarkId_1 = "b1";
+        String bookmarkName_1 = "Bookmark-1";
+        String bookmarkId_2 = "b2";
+        String bookmarkName_2 = "Bookmark-2";
+        Bookmark bookmark_1 = new Bookmark(bookmarkId_1, bookmarkName_1);
+        Bookmark bookmark_2 = new Bookmark(bookmarkId_2, bookmarkName_2);
+        User user = repository.findUserById(testerId);
+        user.addBookmark(bookmark_1);
+        user.addBookmark(bookmark_2);
+
+        List<Bookmark> bookmarkList = bookmarkService.getBookmarks(testerId);
+
+        assertTrue(bookmarkList.contains(bookmark_1));
+        assertTrue(bookmarkList.contains(bookmark_2));
+        assertEquals(2, bookmarkList.size());
     }
 }
